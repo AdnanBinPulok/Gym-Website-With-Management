@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <meta name="description" content="{{ data.site.meta_description or 'Aesthetic Fitness Gym is the best place to achieve your fitness goals!' }}">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Dark theme styles to match dashboard */
+        body {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+    </style>
+</head>
+<body>
+    {% set active_page = 'users' %}
+    {% include 'components/dashboard-sidebar.html' %}
+    <div class="lg:ml-64 min-h-screen p-2 md:p-4 lg:p-6">
+        <div class="border border-slate-600 rounded-lg shadow-lg p-4 sm:p-6 mb-2">
+            <div class="flex items-center gap-2 sm:gap-4">
+                <button onclick="window.location.href='/dashboard/users'" class="text-gray-400 hover:text-white transition-colors flex-shrink-0">
+                    <i class="fas fa-arrow-left text-lg sm:text-xl"></i>
+                </button>
+                <div class="min-w-0">
+                    <h1 class="text-lg sm:text-2xl font-bold truncate" id="edit-user-title">#{{ user_id }} Edit User</h1>
+                    <p class="text-gray-400 text-sm sm:text-base">Modify user information and settings</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="edit-user-container border border-slate-600 rounded-lg shadow-lg p-4 sm:p-6">
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-3xl sm:text-4xl text-blue-400"></i>
+                <p class="text-gray-400 mt-2 text-sm sm:text-base">Loading user information...</p>
+            </div>
+            
+            <!-- User Information -->
+            <div id="user-content" class="hidden">
+                <!-- User Profile Header -->
+                <div class="bg-slate-800 rounded-lg p-4 sm:p-6 mb-6 border border-slate-600">
+                    <div class="flex flex-col sm:flex-row items-center gap-4">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-slate-700 flex-shrink-0">
+                            <img id="user-avatar" src="" alt="User Avatar" class="w-full h-full object-cover hidden">
+                            <div id="avatar-placeholder" class="w-full h-full flex items-center justify-center">
+                                <i class="fas fa-user text-2xl sm:text-3xl text-gray-400"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 text-center sm:text-left">
+                            <h2 id="user-full-name" class="text-xl sm:text-2xl font-bold text-white">--</h2>
+                            <p id="user-username" class="text-gray-400 text-sm sm:text-base">@--</p>
+                            <div class="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
+                                <span id="user-role" class="px-2 py-1 bg-blue-600 text-white text-xs rounded-full">--</span>
+                                <span id="membership-status" class="px-2 py-1 text-xs rounded-full">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Details Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Personal Information -->
+                    <div class="bg-slate-800 rounded-lg p-4 sm:p-6 border border-slate-600">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-user mr-2 text-blue-400"></i>
+                                Personal Information
+                            </h3>
+                            <button id="edit-personal-btn" onclick="togglePersonalEdit()" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-400 transition-colors">
+                                <i class="fas fa-edit mr-1"></i>Edit
+                            </button>
+                        </div>
+                        
+                        <!-- View Mode -->
+                        <div id="personal-view" class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">User ID:</span>
+                                <span id="user-id" class="font-medium">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Email:</span>
+                                <span id="user-email-display" class="font-medium">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Phone:</span>
+                                <span id="user-phone-display" class="font-medium">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Card ID:</span>
+                                <span id="user-card-id-display" class="font-medium">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Balance:</span>
+                                <span id="user-balance" class="font-medium text-green-400">--</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Edit Mode -->
+                        <div id="personal-edit" class="space-y-4 hidden">
+                            <form id="personal-form">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">User ID:</span>
+                                    <span id="user-id-edit" class="font-medium">--</span>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-300 text-sm mb-1">Email:</label>
+                                    <input type="email" id="user-email-input" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-300 text-sm mb-1">Phone:</label>
+                                    <input type="tel" id="user-phone-input" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm" placeholder="Not provided">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-300 text-sm mb-1">Card ID:</label>
+                                    <input type="text" id="user-card-id-input" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm" placeholder="Not assigned">
+                                </div>
+                                
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Balance:</span>
+                                    <span id="user-balance-edit" class="font-medium text-green-400">--</span>
+                                </div>
+                                
+                                <div class="flex gap-2 pt-2">
+                                    <button type="button" onclick="cancelPersonalEdit()" class="flex-1 bg-gray-600 text-white px-3 py-2 rounded text-sm hover:bg-gray-500 transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="flex-1 bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-500 transition-colors">
+                                        <i class="fas fa-save mr-1"></i>Save
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Membership Information -->
+                    <div class="bg-slate-800 rounded-lg p-4 sm:p-6 border border-slate-600 lg:col-span-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-id-card mr-2 text-green-400"></i>
+                                Membership Information
+                            </h3>
+                            <button id="edit-membership-btn" onclick="toggleMembershipEdit()" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-400 transition-colors">
+                                <i class="fas fa-edit mr-1"></i>Edit
+                            </button>
+                        </div>
+                        
+                        <!-- View Mode -->
+                        <div id="membership-view">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <!-- Status & Type -->
+                                <div class="space-y-3">
+                                    <h4 class="font-semibold text-blue-400 border-b border-slate-600 pb-2">Status & Type</h4>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Status:</span>
+                                        <span id="membership-active-display" class="font-medium">N/A</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Type:</span>
+                                        <span id="membership-type-display" class="font-medium">N/A</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Payment Cycle:</span>
+                                        <span id="membership-cycle-display" class="font-medium">N/A</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dates -->
+                                <div class="space-y-3">
+                                    <h4 class="font-semibold text-purple-400 border-b border-slate-600 pb-2">Important Dates</h4>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Start Date:</span>
+                                        <span id="membership-start" class="font-medium">N/A</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">End Date:</span>
+                                        <span id="membership-end" class="font-medium">N/A</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Renewal Date:</span>
+                                        <span id="membership-renewal-display" class="font-medium">N/A</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Financial & Admin -->
+                                <div class="space-y-3">
+                                    <h4 class="font-semibold text-yellow-400 border-b border-slate-600 pb-2">Financial & Admin</h4>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Renewal Price:</span>
+                                        <span id="membership-price-display" class="font-medium text-yellow-400">N/A</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Renewed By:</span>
+                                        <span id="membership-renewal-by" class="font-medium">N/A</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Cancellation Information -->
+                            <div id="cancellation-info" class="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg hidden">
+                                <h4 class="font-semibold text-red-400 mb-3 flex items-center">
+                                    <i class="fas fa-ban mr-2"></i>Cancellation Information
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Cancelled:</span>
+                                        <span id="membership-cancelled" class="font-medium text-red-400">N/A</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Cancelled At:</span>
+                                        <span id="membership-cancelled-at" class="font-medium">N/A</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Cancelled By:</span>
+                                        <span id="membership-cancelled-by" class="font-medium">N/A</span>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Reason:</span>
+                                            <span id="membership-cancelled-reason" class="font-medium">N/A</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Edit Mode -->
+                        <div id="membership-edit" class="hidden">
+                            <form id="membership-form">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <!-- Status & Type -->
+                                    <div class="space-y-4">
+                                        <h4 class="font-semibold text-blue-400 border-b border-slate-600 pb-2">Status & Type</h4>
+                                        
+                                        <div>
+                                            <label class="block text-gray-300 text-sm mb-1">Status:</label>
+                                            <select id="membership-active-input" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                                                <option value="true">Active</option>
+                                                <option value="false">Inactive</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-gray-300 text-sm mb-1">Type:</label>
+                                            <select id="membership-type-input" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                                                <option value="Basic">Basic</option>
+                                                <option value="Standard">Standard</option>
+                                                <option value="Premium">Premium</option>
+                                                <option value="Annual">Annual</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-gray-300 text-sm mb-1">Payment Cycle:</label>
+                                            <select id="membership-cycle-input" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                                                <option value="monthly">Monthly</option>
+                                                <option value="3 months">3 Months</option>
+                                                <option value="6 months">6 Months</option>
+                                                <option value="yearly">Yearly</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Dates -->
+                                    <div class="space-y-4">
+                                        <h4 class="font-semibold text-purple-400 border-b border-slate-600 pb-2">Important Dates</h4>
+                                        
+                                        <div>
+                                            <label class="block text-gray-300 text-sm mb-1">Start Date:</label>
+                                            <input type="datetime-local" id="membership-start-input" class="w-full bg-slate-600 text-gray-300 p-2 rounded border border-slate-600 text-sm cursor-not-allowed" readonly>
+                                            <p class="text-xs text-gray-500 mt-1">Start date cannot be modified</p>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-gray-300 text-sm mb-1">End Date:</label>
+                                            <input type="datetime-local" id="membership-end-input" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-gray-300 text-sm mb-1">Renewal Date:</label>
+                                            <input type="datetime-local" id="membership-renewal-input" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Financial -->
+                                    <div class="space-y-4">
+                                        <h4 class="font-semibold text-yellow-400 border-b border-slate-600 pb-2">Financial</h4>
+                                        
+                                        <div>
+                                            <label class="block text-gray-300 text-sm mb-1">Renewal Price (৳):</label>
+                                            <input type="number" step="0.01" min="0" id="membership-price-input" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm" placeholder="0.00">
+                                        </div>
+                                        
+                                        <div class="pt-4">
+                                            <p class="text-xs text-gray-400">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Dates are in local time and will be converted to UTC when saved.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Form Actions -->
+                                <div class="flex gap-3 mt-6 pt-4 border-t border-slate-600">
+                                    <button type="button" onclick="cancelMembershipEdit()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-colors">
+                                        <i class="fas fa-save mr-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Membership Actions -->
+                        <div class="mt-6 pt-4 border-t border-slate-600">
+                            <h4 class="font-semibold text-gray-300 mb-3">Membership Actions</h4>
+                            <div class="flex flex-wrap gap-3">
+                                <button id="toggle-membership-btn" onclick="showToggleMembershipModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-colors text-sm">
+                                    <i class="fas fa-toggle-on mr-2"></i>Activate Subscription
+                                </button>
+                                <button onclick="showExtendMembershipModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors text-sm">
+                                    <i class="fas fa-calendar-plus mr-2"></i>Extend Membership
+                                </button>
+                                <button onclick="showResetMembershipModal()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors text-sm">
+                                    <i class="fas fa-redo mr-2"></i>Reset Membership
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Status -->
+                    <div class="bg-slate-800 rounded-lg p-4 sm:p-6 border border-slate-600">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-shield-alt mr-2 text-purple-400"></i>
+                            Account Status
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Email Verified:</span>
+                                <span id="email-verified" class="font-medium">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Phone Verified:</span>
+                                <span id="phone-verified" class="font-medium">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Last Login:</span>
+                                <span id="last-login" class="font-medium">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Created:</span>
+                                <span id="created-at" class="font-medium">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Routine -->
+                    <div class="bg-slate-800 rounded-lg p-4 sm:p-6 border border-slate-600 lg:col-span-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-dumbbell mr-2 text-orange-400"></i>
+                                Workout Routine
+                            </h3>
+                            <button id="edit-routine-btn" onclick="toggleRoutineEdit()" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-400 transition-colors">
+                                <i class="fas fa-edit mr-1"></i>Edit
+                            </button>
+                        </div>
+                        
+                        <!-- View Mode -->
+                        <div id="routine-view" class="bg-slate-700 rounded-lg p-4 max-h-80 overflow-y-auto">
+                            <pre id="user-routine-display" class="text-sm text-gray-300 whitespace-pre-wrap">--</pre>
+                        </div>
+                        
+                        <!-- Edit Mode -->
+                        <div id="routine-edit" class="hidden">
+                            <form id="routine-form">
+                                <textarea id="user-routine-input" rows="12" class="w-full bg-slate-700 text-white p-4 rounded border border-slate-600 focus:border-blue-500 text-sm resize-none" placeholder="Enter workout routine..."></textarea>
+                                
+                                <div class="flex gap-2 pt-3">
+                                    <button type="button" onclick="cancelRoutineEdit()" class="flex-1 bg-gray-600 text-white px-3 py-2 rounded text-sm hover:bg-gray-500 transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="flex-1 bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-500 transition-colors">
+                                        <i class="fas fa-save mr-1"></i>Save
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error State -->
+            <div id="error-state" class="text-center py-8 hidden">
+                <i class="fas fa-exclamation-triangle text-3xl sm:text-4xl text-red-500 mb-4"></i>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-400 mb-2">Error Loading User</h3>
+                <p class="text-gray-500 text-sm sm:text-base mb-4">Failed to load user information</p>
+                <button onclick="fetchUserData()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition-colors">
+                    <i class="fas fa-retry mr-2"></i>Try Again
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Membership Action Modals -->
+    
+    <!-- Toggle Membership Modal -->
+    <div id="toggle-membership-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-lg max-w-md w-full border border-slate-600">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <i id="toggle-icon" class="fas fa-toggle-on text-2xl text-green-400 mr-3"></i>
+                    <h3 id="toggle-title" class="text-lg font-semibold">Activate Subscription</h3>
+                </div>
+                <p id="toggle-message" class="text-gray-300 mb-4">Configure the membership activation settings.</p>
+                
+                <div id="months-input-container">
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm mb-2">Membership Type:</label>
+                        <select id="activation-membership-type" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                            <option value="Basic">Basic</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Premium">Premium</option>
+                            <option value="Annual">Annual</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm mb-2">Duration (Months):</label>
+                        <input type="number" id="activation-months" min="1" max="60" value="1" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm mb-2">Renewal Notice (Days before expiry):</label>
+                        <input type="number" id="renewal-notice-days" min="1" max="90" value="7" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                        <p class="text-xs text-gray-400 mt-1">Renewal date will be set this many days before the membership expires</p>
+                    </div>
+                </div>
+                
+                <div id="reason-input-container" class="hidden">
+                    <label class="block text-gray-300 text-sm mb-2">Reason for deactivation:</label>
+                    <textarea id="deactivation-reason" rows="3" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm resize-none" placeholder="Please provide a reason for deactivating this membership..."></textarea>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeToggleMembershipModal()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                        Cancel
+                    </button>
+                    <button id="confirm-toggle-btn" onclick="confirmToggleMembership()" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-colors">
+                        <i class="fas fa-check mr-2"></i>Activate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Extend Membership Modal -->
+    <div id="extend-membership-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-lg max-w-md w-full border border-slate-600">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-calendar-plus text-2xl text-blue-400 mr-3"></i>
+                    <h3 class="text-lg font-semibold">Extend Membership</h3>
+                </div>
+                <p class="text-gray-300 mb-4">How many months would you like to extend the membership?</p>
+                <div>
+                    <label class="block text-gray-300 text-sm mb-2">Months:</label>
+                    <input type="number" id="extend-months" min="1" max="60" value="1" class="w-full bg-slate-700 text-white p-2 rounded border border-slate-600 focus:border-blue-500 text-sm">
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeExtendMembershipModal()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                        Cancel
+                    </button>
+                    <button onclick="confirmExtendMembership()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors">
+                        <i class="fas fa-check mr-2"></i>Extend
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reset Membership Modal -->
+    <div id="reset-membership-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-lg max-w-md w-full border border-slate-600">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-400 mr-3"></i>
+                    <h3 class="text-lg font-semibold text-red-400">Reset Membership</h3>
+                </div>
+                <p class="text-gray-300 mb-4">
+                    <strong>Warning:</strong> This will completely reset the user's membership. This action cannot be undone.
+                </p>
+                <p class="text-gray-400 text-sm mb-4">
+                    Are you sure you want to proceed with resetting this membership?
+                </p>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeResetMembershipModal()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                        Cancel
+                    </button>
+                    <button onclick="confirmResetMembership()" class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">
+                        <i class="fas fa-redo mr-2"></i>Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script>
+    USER_ID = parseInt('{{ user_id or 0 }}');
+    let userData = {};
+    let subscriptionTypes = [];
+    let isEditingPersonal = false;
+    let isEditingRoutine = false;
+    let isEditingMembership = false;
+    
+    // Fetch subscription types from API
+    async function fetchSubscriptionTypes() {
+        try {
+            const response = await fetch('/api/get-subscriptions-names');
+            if (!response.ok) {
+                throw new Error('Failed to fetch subscription types');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                subscriptionTypes = data.data || [];
+                populateSubscriptionDropdowns();
+            } else {
+                console.error('Failed to fetch subscription types:', data.message);
+                // Use default types if API fails
+                subscriptionTypes = ['Basic', 'Standard', 'Premium', 'Annual'];
+                populateSubscriptionDropdowns();
+            }
+        } catch (error) {
+            console.error('Error fetching subscription types:', error);
+            // Use default types if API fails
+            subscriptionTypes = ['Basic', 'Standard', 'Premium', 'Annual'];
+            populateSubscriptionDropdowns();
+        }
+    }
+    
+    // Populate subscription dropdowns with fetched types
+    function populateSubscriptionDropdowns() {
+        const membershipTypeInput = document.getElementById('membership-type-input');
+        const activationMembershipType = document.getElementById('activation-membership-type');
+        
+        // Clear existing options
+        membershipTypeInput.innerHTML = '';
+        activationMembershipType.innerHTML = '';
+        
+        // Add new options
+        subscriptionTypes.forEach(type => {
+            const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
+            
+            // For membership edit dropdown
+            const option1 = document.createElement('option');
+            option1.value = capitalizedType;
+            option1.textContent = capitalizedType;
+            membershipTypeInput.appendChild(option1);
+            
+            // For activation modal dropdown
+            const option2 = document.createElement('option');
+            option2.value = capitalizedType;
+            option2.textContent = capitalizedType;
+            activationMembershipType.appendChild(option2);
+        });
+    }
+    
+    // Fetch user data from API
+    async function fetchUserData() {
+        try {
+            showLoading();
+            
+            if (!USER_ID || USER_ID === 0) {
+                throw new Error('Invalid user ID');
+            }
+            
+            const response = await fetch(`/api/get-user?user_id=${USER_ID}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                userData = data.data || {};
+                renderUserData();
+            } else {
+                throw new Error(data.message || 'Failed to fetch user data');
+            }
+            
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            showError();
+        }
+    }
+    
+    // Render user data
+    function renderUserData() {
+        // Update page title
+        document.getElementById('edit-user-title').textContent = `#${userData.id} Edit User`;
+        
+        // Personal Information - View Mode
+        document.getElementById('user-id').textContent = userData.id || '--';
+        document.getElementById('user-id-edit').textContent = userData.id || '--';
+        document.getElementById('user-email-display').textContent = userData.email || '--';
+        document.getElementById('user-phone-display').textContent = userData.phone || 'Not provided';
+        document.getElementById('user-card-id-display').textContent = userData.card_id || 'Not assigned';
+        document.getElementById('user-balance').textContent = userData.balance ? `৳${parseFloat(userData.balance).toFixed(2)}` : '৳0.00';
+        document.getElementById('user-balance-edit').textContent = userData.balance ? `৳${parseFloat(userData.balance).toFixed(2)}` : '৳0.00';
+        
+        // Personal Information - Edit Mode Inputs
+        document.getElementById('user-email-input').value = userData.email || '';
+        document.getElementById('user-phone-input').value = userData.phone || '';
+        document.getElementById('user-card-id-input').value = userData.card_id || '';
+        
+        // User Header
+        document.getElementById('user-full-name').textContent = userData.full_name || '--';
+        document.getElementById('user-username').textContent = `@${userData.username || '--'}`;
+        
+        // Role
+        const roleElement = document.getElementById('user-role');
+        roleElement.textContent = userData.role || '--';
+        roleElement.className = `px-2 py-1 text-xs rounded-full ${getRoleColor(userData.role)}`;
+        
+        // Avatar
+        const avatarImg = document.getElementById('user-avatar');
+        const avatarPlaceholder = document.getElementById('avatar-placeholder');
+        if (userData.avatar_url) {
+            avatarImg.src = userData.avatar_url;
+            avatarImg.classList.remove('hidden');
+            avatarPlaceholder.style.display = 'none';
+        } else {
+            avatarImg.classList.add('hidden');
+            avatarPlaceholder.style.display = 'flex';
+        }
+        
+        // Comprehensive Membership Information - View Mode
+        const isActive = userData.membership_active;
+        
+        // Status & Type
+        document.getElementById('membership-active-display').innerHTML = isActive 
+            ? '<span class="text-green-400"><i class="fas fa-check-circle mr-1"></i>Active</span>'
+            : '<span class="text-red-400"><i class="fas fa-times-circle mr-1"></i>Inactive</span>';
+        document.getElementById('membership-type-display').textContent = userData.membership_type || 'N/A';
+        document.getElementById('membership-cycle-display').textContent = userData.membership_payment_cycle || 'N/A';
+        
+        // Dates
+        document.getElementById('membership-start').textContent = formatDate(userData.membership_start_date) || 'N/A';
+        document.getElementById('membership-end').textContent = formatDate(userData.membership_end_date) || 'N/A';
+        document.getElementById('membership-renewal-display').textContent = formatDate(userData.membership_renewal_date) || 'N/A';
+        
+        // Financial & Admin
+        document.getElementById('membership-price-display').textContent = userData.membership_renewal_price 
+            ? `৳${parseFloat(userData.membership_renewal_price).toFixed(2)}` 
+            : 'N/A';
+        document.getElementById('membership-renewal-by').textContent = userData.membership_renewal_by || 'N/A';
+        
+        // Membership Information - Edit Mode Inputs
+        document.getElementById('membership-active-input').value = isActive ? 'true' : 'false';
+        document.getElementById('membership-type-input').value = userData.membership_type || 'Basic';
+        document.getElementById('membership-cycle-input').value = userData.membership_payment_cycle || 'monthly';
+        document.getElementById('membership-start-input').value = formatDateTimeLocal(userData.membership_start_date);
+        document.getElementById('membership-end-input').value = formatDateTimeLocal(userData.membership_end_date);
+        document.getElementById('membership-renewal-input').value = formatDateTimeLocal(userData.membership_renewal_date);
+        document.getElementById('membership-price-input').value = userData.membership_renewal_price ? parseFloat(userData.membership_renewal_price).toFixed(2) : '';
+        
+        // Cancellation Information
+        const isCancelled = userData.membership_cancelled;
+        const cancellationInfo = document.getElementById('cancellation-info');
+        
+        if (isCancelled) {
+            cancellationInfo.classList.remove('hidden');
+            document.getElementById('membership-cancelled').innerHTML = '<span class="text-red-400"><i class="fas fa-ban mr-1"></i>Yes</span>';
+            document.getElementById('membership-cancelled-at').textContent = formatDateTime(userData.membership_cancelled_at) || 'N/A';
+            document.getElementById('membership-cancelled-by').textContent = userData.membership_cancelled_by || 'N/A';
+            document.getElementById('membership-cancelled-reason').textContent = userData.membership_cancelled_reason || 'N/A';
+        } else {
+            cancellationInfo.classList.add('hidden');
+        }
+        
+        // Membership Status (for header badge)
+        const membershipStatusElement = document.getElementById('membership-status');
+        membershipStatusElement.textContent = isActive ? 'Active' : 'Inactive';
+        membershipStatusElement.className = `px-2 py-1 text-xs rounded-full ${isActive ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`;
+        
+        // Account Status
+        document.getElementById('email-verified').innerHTML = getVerificationBadge(userData.email_verified);
+        document.getElementById('phone-verified').innerHTML = getVerificationBadge(userData.phone_verified);
+        document.getElementById('last-login').textContent = formatDateTime(userData.last_login);
+        document.getElementById('created-at').textContent = formatDateTime(userData.created_at);
+        
+        // Routine
+        document.getElementById('user-routine-display').textContent = userData.routine || 'No routine assigned';
+        document.getElementById('user-routine-input').value = userData.routine || '';
+        
+        // Update membership action button
+        const toggleBtn = document.getElementById('toggle-membership-btn');
+        if (isActive) {
+            toggleBtn.innerHTML = '<i class="fas fa-toggle-off mr-2"></i>Deactivate Subscription';
+            toggleBtn.className = 'bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors text-sm';
+        } else {
+            toggleBtn.innerHTML = '<i class="fas fa-toggle-on mr-2"></i>Activate Subscription';
+            toggleBtn.className = 'bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-colors text-sm';
+        }
+        
+        // Show content
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('user-content').classList.remove('hidden');
+        document.getElementById('error-state').classList.add('hidden');
+    }
+    
+    // Personal Information editing functions
+    function togglePersonalEdit() {
+        if (isEditingPersonal) {
+            cancelPersonalEdit();
+        } else {
+            startPersonalEdit();
+        }
+    }
+    
+    function startPersonalEdit() {
+        isEditingPersonal = true;
+        document.getElementById('personal-view').classList.add('hidden');
+        document.getElementById('personal-edit').classList.remove('hidden');
+        document.getElementById('edit-personal-btn').innerHTML = '<i class="fas fa-times mr-1"></i>Cancel';
+    }
+    
+    function cancelPersonalEdit() {
+        isEditingPersonal = false;
+        document.getElementById('personal-view').classList.remove('hidden');
+        document.getElementById('personal-edit').classList.add('hidden');
+        document.getElementById('edit-personal-btn').innerHTML = '<i class="fas fa-edit mr-1"></i>Edit';
+        
+        // Reset form values
+        renderUserData();
+    }
+    
+    // Membership editing functions
+    function toggleMembershipEdit() {
+        if (isEditingMembership) {
+            cancelMembershipEdit();
+        } else {
+            startMembershipEdit();
+        }
+    }
+    
+    function startMembershipEdit() {
+        isEditingMembership = true;
+        document.getElementById('membership-view').classList.add('hidden');
+        document.getElementById('membership-edit').classList.remove('hidden');
+        document.getElementById('edit-membership-btn').innerHTML = '<i class="fas fa-times mr-1"></i>Cancel';
+    }
+    
+    function cancelMembershipEdit() {
+        isEditingMembership = false;
+        document.getElementById('membership-view').classList.remove('hidden');
+        document.getElementById('membership-edit').classList.add('hidden');
+        document.getElementById('edit-membership-btn').innerHTML = '<i class="fas fa-edit mr-1"></i>Edit';
+        
+        // Reset form values
+        renderUserData();
+    }
+    
+    // Routine editing functions
+    function toggleRoutineEdit() {
+        if (isEditingRoutine) {
+            cancelRoutineEdit();
+        } else {
+            startRoutineEdit();
+        }
+    }
+    
+    function startRoutineEdit() {
+        isEditingRoutine = true;
+        document.getElementById('routine-view').classList.add('hidden');
+        document.getElementById('routine-edit').classList.remove('hidden');
+        document.getElementById('edit-routine-btn').innerHTML = '<i class="fas fa-times mr-1"></i>Cancel';
+    }
+    
+    function cancelRoutineEdit() {
+        isEditingRoutine = false;
+        document.getElementById('routine-view').classList.remove('hidden');
+        document.getElementById('routine-edit').classList.add('hidden');
+        document.getElementById('edit-routine-btn').innerHTML = '<i class="fas fa-edit mr-1"></i>Edit';
+        
+        // Reset form values
+        renderUserData();
+    }
+    
+    // Handle personal information form submission
+    document.getElementById('personal-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Saving...';
+            
+            // Prepare only changed data
+            const formData = {};
+            
+            const newEmail = document.getElementById('user-email-input').value.trim();
+            const newPhone = document.getElementById('user-phone-input').value.trim();
+            const newCardId = document.getElementById('user-card-id-input').value.trim();
+            
+            if (newEmail !== userData.email) {
+                formData.email = newEmail;
+            }
+            if (newPhone !== userData.phone) {
+                formData.phone = newPhone || null;
+            }
+            if (newCardId !== userData.card_id) {
+                formData.card_id = newCardId || null;
+            }
+            
+            // Only send request if there are changes
+            if (Object.keys(formData).length === 0) {
+                showErrorMessage('No changes detected.');
+                return;
+            }
+            
+            // Add user ID
+            formData.id = parseInt(userData.id);
+            
+            const response = await fetch('/api/update-user-mail-or-phone-or-cardid', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to update personal information');
+            }
+            
+            
+            
+            if (result.success) {
+                showSuccessMessage('Personal information updated successfully!');
+                // Refresh user data
+                await fetchUserData();
+                cancelPersonalEdit();
+            } else {
+                throw new Error(result.message || 'Failed to update personal information');
+            }
+            
+        } catch (error) {
+            console.error('Error updating personal information:', error);
+            showErrorMessage(error.message || 'Failed to update personal information. Please try again.');
+        } finally {
+            const submitBtn = document.querySelector('#personal-form button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save mr-1"></i>Save';
+        }
+    });
+    
+    // Handle membership form submission
+    document.getElementById('membership-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+            
+            const formData = {
+                id: parseInt(userData.id),
+                membership_active: document.getElementById('membership-active-input').value === 'true',
+                membership_type: document.getElementById('membership-type-input').value,
+                membership_payment_cycle: document.getElementById('membership-cycle-input').value,
+                membership_start_date: convertToUTC(document.getElementById('membership-start-input').value),
+                membership_end_date: convertToUTC(document.getElementById('membership-end-input').value),
+                membership_renewal_date: convertToUTC(document.getElementById('membership-renewal-input').value),
+                membership_renewal_price: parseFloat(document.getElementById('membership-price-input').value) || 0
+            };
+            
+            const response = await fetch('/api/update-membership', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to update membership information');
+            }
+            
+            if (result.success) {
+                showSuccessMessage('Membership information updated successfully!');
+                // Refresh user data
+                await fetchUserData();
+                cancelMembershipEdit();
+            } else {
+                throw new Error(result.message || 'Failed to update membership information');
+            }
+            
+        } catch (error) {
+            console.error('Error updating membership:', error);
+            showErrorMessage(error.message || 'Failed to update membership information. Please try again.');
+        } finally {
+            const submitBtn = document.querySelector('#membership-form button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Save Changes';
+        }
+    });
+    
+    // Handle routine form submission
+    document.getElementById('routine-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Saving...';
+            
+            const newRoutine = document.getElementById('user-routine-input').value.trim();
+            
+            // Check if routine changed
+            if (newRoutine === userData.routine) {
+                showErrorMessage('No changes detected.');
+                return;
+            }
+            
+            const formData = {
+                id: parseInt(userData.id),
+                text: newRoutine || null
+            };
+            
+            const response = await fetch('/api/update-routine', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to update routine');
+            }
+            
+            if (result.success) {
+                showSuccessMessage('Routine updated successfully!');
+                // Refresh user data
+                await fetchUserData();
+                cancelRoutineEdit();
+            } else {
+                throw new Error(result.message || 'Failed to update routine');
+            }
+            
+        } catch (error) {
+            console.error('Error updating routine:', error);
+            showErrorMessage(error.message || 'Failed to update routine. Please try again.');
+        } finally {
+            const submitBtn = document.querySelector('#routine-form button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save mr-1"></i>Save';
+        }
+    });
+    
+    // Convert local datetime to UTC ISO string
+    function convertToUTC(localDateTimeString) {
+        if (!localDateTimeString) return null;
+        const localDate = new Date(localDateTimeString);
+        return localDate.toISOString();
+    }
+    
+    // Utility functions
+    function getRoleColor(role) {
+        switch (role) {
+            case 'superadmin': return 'bg-purple-600 text-white';
+            case 'admin': return 'bg-blue-600 text-white';
+            case 'member': return 'bg-green-600 text-white';
+            default: return 'bg-gray-600 text-white';
+        }
+    }
+    
+    function getVerificationBadge(verified) {
+        return verified 
+            ? '<span class="text-green-400"><i class="fas fa-check-circle mr-1"></i>Verified</span>'
+            : '<span class="text-red-400"><i class="fas fa-times-circle mr-1"></i>Not Verified</span>';
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return '--';
+        const date = new Date(dateString);
+        return date.toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+    
+    function formatDateTime(dateString) {
+        if (!dateString) return '--';
+        const date = new Date(dateString);
+        return date.toLocaleString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+    
+    function formatDateTimeLocal(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        // Convert to local timezone and format for datetime-local input
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+    
+    function showLoading() {
+        document.getElementById('loading-state').classList.remove('hidden');
+        document.getElementById('user-content').classList.add('hidden');
+        document.getElementById('error-state').classList.add('hidden');
+    }
+    
+    function showError() {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('user-content').classList.add('hidden');
+        document.getElementById('error-state').classList.remove('hidden');
+    }
+    
+    function showSuccessMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-sm';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    function showErrorMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-sm';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    // Membership action modal functions
+    function showToggleMembershipModal() {
+        const isActive = userData.membership_active;
+        const modal = document.getElementById('toggle-membership-modal');
+        const icon = document.getElementById('toggle-icon');
+        const title = document.getElementById('toggle-title');
+        const message = document.getElementById('toggle-message');
+        const monthsContainer = document.getElementById('months-input-container');
+        const reasonContainer = document.getElementById('reason-input-container');
+        const confirmBtn = document.getElementById('confirm-toggle-btn');
+        
+        if (isActive) {
+            // Deactivate
+            icon.className = 'fas fa-toggle-off text-2xl text-red-400 mr-3';
+            title.textContent = 'Deactivate Subscription';
+            message.textContent = 'Are you sure you want to deactivate this subscription? Please provide a reason.';
+            monthsContainer.style.display = 'none';
+            reasonContainer.style.display = 'block';
+            confirmBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Deactivate';
+            confirmBtn.className = 'flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors';
+        } else {
+            // Activate
+            icon.className = 'fas fa-toggle-on text-2xl text-green-400 mr-3';
+            title.textContent = 'Activate Subscription';
+            message.textContent = 'Configure the membership activation settings.';
+            monthsContainer.style.display = 'block';
+            reasonContainer.style.display = 'none';
+            confirmBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Activate';
+            confirmBtn.className = 'flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-colors';
+        }
+        
+        modal.classList.remove('hidden');
+    }
+    
+    function closeToggleMembershipModal() {
+        document.getElementById('toggle-membership-modal').classList.add('hidden');
+        document.getElementById('activation-months').value = '1';
+        document.getElementById('activation-membership-type').value = 'Basic';
+        document.getElementById('renewal-notice-days').value = '7';
+        document.getElementById('deactivation-reason').value = '';
+    }
+    
+    async function confirmToggleMembership() {
+        const isActive = userData.membership_active;
+        const confirmBtn = document.getElementById('confirm-toggle-btn');
+        const originalText = confirmBtn.innerHTML;
+        
+        try {
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
+            let endpoint, body, successMessage;
+            
+            if (isActive) {
+                // Deactivate
+                const reason = document.getElementById('deactivation-reason').value.trim();
+                if (!reason) {
+                    throw new Error('Please provide a reason for deactivation');
+                }
+                endpoint = '/api/deactivate-user-membership';
+                body = { 
+                    id: parseInt(userData.id),
+                    reason: reason
+                };
+                successMessage = 'Membership deactivated successfully!';
+            } else {
+                // Activate
+                const months = parseInt(document.getElementById('activation-months').value);
+                const membershipType = document.getElementById('activation-membership-type').value;
+                const renewalNoticeDays = parseInt(document.getElementById('renewal-notice-days').value);
+                
+                if (!months || months < 1) {
+                    throw new Error('Please enter a valid number of months');
+                }
+                if (!renewalNoticeDays || renewalNoticeDays < 1) {
+                    throw new Error('Please enter a valid number of renewal notice days');
+                }
+                
+                endpoint = '/api/active-user-membership';
+                body = { 
+                    id: parseInt(userData.id), 
+                    months: months,
+                    membership_type: membershipType,
+                    renewal_notice_days: renewalNoticeDays
+                };
+                successMessage = `${membershipType} membership activated for ${months} month(s) successfully!`;
+            }
+            
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Operation failed');
+            }
+            
+            showSuccessMessage(successMessage);
+            closeToggleMembershipModal();
+            await fetchUserData();
+            
+        } catch (error) {
+            console.error('Error toggling membership:', error);
+            showErrorMessage(error.message || 'Failed to update membership. Please try again.');
+        } finally {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalText;
+        }
+    }
+    
+    function showExtendMembershipModal() {
+        document.getElementById('extend-membership-modal').classList.remove('hidden');
+    }
+    
+    function closeExtendMembershipModal() {
+        document.getElementById('extend-membership-modal').classList.add('hidden');
+        document.getElementById('extend-months').value = '1';
+    }
+    
+    async function confirmExtendMembership() {
+        const months = parseInt(document.getElementById('extend-months').value);
+        
+        if (!months || months < 1) {
+            showErrorMessage('Please enter a valid number of months');
+            return;
+        }
+        
+        const confirmBtn = document.querySelector('#extend-membership-modal button[onclick="confirmExtendMembership()"]');
+        const originalText = confirmBtn.innerHTML;
+        
+        try {
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Extending...';
+            
+            const response = await fetch('/api/extend-user-membership', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    id: parseInt(userData.id), 
+                    months: months 
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Failed to extend membership');
+            }
+            
+            showSuccessMessage(`Membership extended by ${months} month(s) successfully!`);
+            closeExtendMembershipModal();
+            await fetchUserData();
+            
+        } catch (error) {
+            console.error('Error extending membership:', error);
+            showErrorMessage(error.message || 'Failed to extend membership. Please try again.');
+        } finally {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalText;
+        }
+    }
+    
+    function showResetMembershipModal() {
+        document.getElementById('reset-membership-modal').classList.remove('hidden');
+    }
+    
+    function closeResetMembershipModal() {
+        document.getElementById('reset-membership-modal').classList.add('hidden');
+    }
+    
+    async function confirmResetMembership() {
+        const confirmBtn = document.querySelector('#reset-membership-modal button[onclick="confirmResetMembership()"]');
+        const originalText = confirmBtn.innerHTML;
+        
+        try {
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Resetting...';
+            
+            const response = await fetch('/api/reset-membership', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: parseInt(userData.id) })
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Failed to reset membership');
+            }
+            
+            showSuccessMessage('Membership reset successfully!');
+            closeResetMembershipModal();
+            await fetchUserData();
+            
+        } catch (error) {
+            console.error('Error resetting membership:', error);
+            showErrorMessage(error.message || 'Failed to reset membership. Please try again.');
+        } finally {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalText;
+        }
+    }
+    
+    // Close modals when clicking outside
+    document.addEventListener('click', function(e) {
+        const modals = ['toggle-membership-modal', 'extend-membership-modal', 'reset-membership-modal'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    });
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', async () => {
+        await fetchSubscriptionTypes();
+        await fetchUserData();
+    });
+</script>
+</html>

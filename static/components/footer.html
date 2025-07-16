@@ -1,0 +1,169 @@
+<footer class="bg-gray-900 border-t border-gray-800" role="contentinfo">
+    <div class="container mx-auto px-2 sm:px-3 lg:px-6 py-12 md:py-16">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            <!-- Brand Section -->
+            <div class="lg:col-span-1">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="relative">
+                        {% if data.site.logo %}
+                        <img src="{{ data.site.logo }}" alt="{{ data.site.name or 'Aesthetic Fitness Gym' }}" 
+                             class="w-12 h-12 object-contain rounded-lg transform hover:scale-105 transition-all duration-300">
+                        {% else %}
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/25 transform hover:scale-105 transition-all duration-300" aria-hidden="true">
+                            <i class="fas fa-dumbbell text-black text-xl"></i>
+                        </div>
+                        {% endif %}
+                        <!-- Glowing effect -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-lg blur-md opacity-20 -z-10"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-bold text-white">{{ data.site.name or 'Aesthetic Fitness Gym' }}</h3>
+                        <p class="text-gray-400 text-sm">Your Fitness Journey Starts Here</p>
+                    </div>
+                </div>
+                <p class="text-gray-400 leading-relaxed mb-6 text-sm md:text-base">
+                    {{ data.site.description or 'Your premier destination for aesthetic fitness and body transformation. Join our community of dedicated athletes.' }}
+                </p>
+                <div class="flex space-x-4" role="list" aria-label="Social media links">
+                    {% if data.site.social_links %}
+                    {% for social in data.site.social_links %}
+                    <a href="{{ social.url }}" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       aria-label="Visit our {{ social.name or 'social media' }} page"
+                       class="w-10 h-10 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-colors duration-300 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                       role="listitem">
+                        <i class="{{ social.icon }} text-gray-400 group-hover:text-black" aria-hidden="true"></i>
+                    </a>
+                    {% endfor %}
+                    {% endif %}
+                    <a href="{{ data.site.contact.whatsapp or '' }}" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       aria-label="Contact us on WhatsApp"
+                       class="w-10 h-10 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-colors duration-300 group focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                       role="listitem">
+                        <i class="fab fa-whatsapp text-gray-400 group-hover:text-black" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <nav aria-label="Quick links">
+                <h4 class="text-white font-bold text-lg mb-6">Quick Links</h4>
+                <ul class="space-y-3" role="list">
+                    <li><a href="/" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Home</a></li>
+                    <li><a href="/about" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">About Us</a></li>
+                    {% if data.gallery and data.gallery|length > 0 %}
+                    <li><a href="/gallery" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Gallery</a></li>
+                    {% endif %}
+                    <li><a href="#programs" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Programs</a></li>
+                    <li><a href="/schedule" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Schedule</a></li>
+                    <li><a href="#location" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Location</a></li>
+                    <li><a href="/contact" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Services -->
+            <nav aria-label="Our services">
+                <h4 class="text-white font-bold text-lg mb-6">Services</h4>
+                <ul class="space-y-3" role="list">
+                    <li><a href="#" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Personal Training</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Group Classes</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Nutrition Coaching</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Body Composition</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Recovery Therapy</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Online Coaching</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Contact Info -->
+            <div>
+                <h4 class="text-white font-bold text-lg mb-6">Get In Touch</h4>
+                <address class="space-y-4 not-italic">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-map-marker-alt text-orange-500 mt-1 flex-shrink-0" aria-hidden="true"></i>
+                        <div>
+                            <p class="text-gray-400 text-sm md:text-base">{{ data.site.location_address or 'F-224, M.rahaman complex, Gazipur' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-phone text-orange-500 flex-shrink-0" aria-hidden="true"></i>
+                        <a href="tel:{{ data.site.contact.phone or '+8801670442072' }}" 
+                           class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500"
+                           aria-label="Call us at {{ data.site.contact.phone or '+880 167 044 2072' }}">
+                            {{ data.site.contact.phone or '+880 167 044 2072' }}
+                        </a>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-envelope text-orange-500 flex-shrink-0" aria-hidden="true"></i>
+                        <a href="mailto:{{ data.site.contact.email or 'astheticfitnessclub2022@gmail.com' }}" 
+                           class="text-gray-400 hover:text-orange-500 transition-colors duration-300 text-sm focus:outline-none focus:text-orange-500"
+                           aria-label="Email us">
+                            {{ data.site.contact.email or 'astheticfitnessclub2022@gmail.com' }}
+                        </a>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fab fa-whatsapp text-orange-500 flex-shrink-0" aria-hidden="true"></i>
+                        <a href="{{ data.site.contact.whatsapp or '' }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="text-gray-400 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500"
+                           aria-label="Message us on WhatsApp">
+                            WhatsApp Us
+                        </a>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-clock text-orange-500 mt-1 flex-shrink-0" aria-hidden="true"></i>
+                        <div class="text-gray-400">
+                            <p class="text-sm">Mon-Thu, Sat-Sun: 7AM-11PM</p>
+                            <p class="text-xs">Timezone: {{ data.site.timezone or 'Asia/Dhaka' }}</p>
+                        </div>
+                    </div>
+                </address>
+            </div>
+        </div>
+        
+        <!-- Newsletter Signup -->
+        <div class="border-t border-gray-800 mt-12 pt-8">
+            <div class="max-w-2xl mx-auto text-center">
+                <h4 class="text-white font-bold text-xl mb-4">Stay Updated</h4>
+                <p class="text-gray-400 mb-6">Get the latest workout tips, nutrition advice, and exclusive offers</p>
+                <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto" aria-label="Newsletter signup">
+                    <label for="newsletter-email" class="sr-only">Email address</label>
+                    <input type="email" 
+                           id="newsletter-email"
+                           name="email"
+                           placeholder="Enter your email" 
+                           required
+                           aria-describedby="newsletter-description"
+                           class="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-full text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300">
+                    <button type="submit" 
+                            class="bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                        Subscribe
+                    </button>
+                </form>
+                <p id="newsletter-description" class="text-xs text-gray-500 mt-2">We respect your privacy and never spam.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Bar -->
+    <div class="border-t border-gray-800 bg-black">
+        <div class="container mx-auto px-2 sm:px-3 lg:px-6 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-gray-500 text-sm">
+                    © {{ data.site.year }} {{ data.site.name or 'Aesthetic Fitness Gym' }}. All rights reserved.
+                    {% if data.site.domain %} | {{ data.site.domain }}{% endif %}
+                </p>
+                <nav aria-label="Legal links">
+                    <div class="flex space-x-6 text-sm">
+                        <a href="#" class="text-gray-500 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Privacy Policy</a>
+                        <a href="#" class="text-gray-500 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Terms of Service</a>
+                        <a href="#" class="text-gray-500 hover:text-orange-500 transition-colors duration-300 focus:outline-none focus:text-orange-500">Cookie Policy</a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>429 - Too Many Requests</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            padding: 40px 20px;
+        }
+        
+        .error-code {
+            font-size: 120px;
+            font-weight: bold;
+            color: #dc3545;
+            line-height: 1;
+            animation: pulse 2s infinite;
+        }
+        
+        .error-message {
+            font-size: 32px;
+            margin: 20px 0;
+        }
+        
+        .error-description {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #6c757d;
+        }
+        
+        .retry-message {
+            font-size: 16px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8d7da;
+            border-radius: 8px;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin: 0 10px;
+        }
+        
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .navigation {
+            margin-top: 40px;
+        }
+        
+        .navigation a {
+            color: #007bff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        
+        .navigation a:hover {
+            text-decoration: underline;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 100px;
+            }
+            
+            .error-message {
+                font-size: 28px;
+            }
+            
+            .error-description {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .error-code {
+                font-size: 80px;
+            }
+            
+            .error-message {
+                font-size: 24px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-code">429</div>
+        <h1 class="error-message">Too Many Requests</h1>
+        <p class="error-description">
+            You've sent too many requests in a short period of time.
+            Please slow down and try again later.
+        </p>
+        
+        <div class="retry-message">
+            Please wait a few moments before trying again. Our system limits the number of requests 
+            to ensure fair usage for all users.
+        </div>
+        
+        <a href="/" class="btn">Back to Homepage</a>
+        
+        <div class="navigation">
+            <a href="/contact">Contact Support</a>
+        </div>
+    </div>
+    
+    <script>
+        // Auto refresh after 10 seconds
+        setTimeout(function() {
+            window.location.href = '/';
+        }, 10000);
+    </script>
+</body>
+</html>

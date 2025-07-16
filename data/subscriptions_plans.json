@@ -1,0 +1,119 @@
+{
+    "subscriptions_plans": [
+        {
+            "name": "Basic Plan",
+            "value": "basic",
+            "admission_fee": 1000,
+            "final_admission_fee": 1000,
+            "fee": 1500,
+            "final_fee": 1000,
+            "cycle": "monthly",
+            "features": {
+                "gym_access": true,
+                "equipment_access": true,
+                "locker_access": true,
+                "pt_sessions": 0
+            },
+            "description": "Great for beginners starting their fitness journey",
+            "popular": false,
+            "best_value": false
+        },
+        {
+            "name": "Standard Plan",
+            "admission_fee": 1000,
+            "final_admission_fee": 0,
+            "fee": 3000,
+            "final_fee": 3000,
+            "cycle": "3 months",
+            "features": {
+                "gym_access": true,
+                "equipment_access": true,
+                "locker_access": true,
+                "pt_sessions": 1
+            },
+            "description": "Most popular choice for serious fitness enthusiasts",
+            "popular": true,
+            "best_value": false
+        },
+        {
+            "name": "Premium Plan",
+            "value": "premium",
+            "admission_fee": 1000,
+            "final_admission_fee": 0,
+            "fee": 6000,
+            "final_fee": 5500,
+            "cycle": "6 months",
+            "features": {
+                "gym_access": true,
+                "equipment_access": true,
+                "locker_access": true,
+                "pt_sessions": 3
+            },
+            "description": "Extended plan for dedicated athletes",
+            "popular": false,
+            "best_value": false
+        },
+        {
+            "name": "Annual Plan",
+            "value": "annual",
+            "admission_fee": 1000,
+            "final_admission_fee": 0,
+            "fee": 12000,
+            "final_fee": 10000,
+            "cycle": "yearly",
+            "features": {
+                "gym_access": true,
+                "equipment_access": true,
+                "locker_access": true,
+                "pt_sessions": 6
+            },
+            "description": "Best value for long-term commitment",
+            "popular": false,
+            "best_value": true
+        },
+        {
+            "name": "Daily Pass",
+            "value": "daily",
+            "admission_fee": 0,
+            "final_admission_fee": 0,
+            "fee": 200,
+            "final_fee": 200,
+            "cycle": "daily",
+            "features": {
+                "gym_access": true,
+                "equipment_access": true,
+                "locker_access": false,
+                "pt_sessions": 0
+            },
+            "description": "Perfect for trying out our facilities",
+            "popular": false,
+            "best_value": false
+        }
+    ],
+    "personal_training": {
+        "name": "Personal Training",
+        "fixed": false,
+        "fee": 0,
+        "final_fee": 0,
+        "cycle": "session",
+        "features": [
+            "Personalized Workout Plans",
+            "Form Correction & Technique",
+            "Goal-specific Programming",
+            "Progress Tracking",
+            "Flexible Scheduling"
+        ],
+        "description": "One-on-one training sessions tailored to your goals"
+    },
+    "locker_access": {
+        "name": "Premium Locker Access",
+        "price": 1000,
+        "cycle": "yearly",
+        "features": [
+            "Personal Locker Assignment",
+            "Secure Storage",
+            "Storage for Personal Items"
+        ],
+        "description": "Get your own dedicated locker with premium features"
+    }
+}

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>About Us - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <meta name="description" content="Learn about {{ data.site.name or 'Aesthetic Fitness Gym' }} - Our mission, vision, and commitment to your fitness journey.">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s ease-in-out infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-16 lg:pt-20">
+        <!-- Hero Section -->
+        <section class="relative py-12 md:py-20 lg:py-32 bg-black overflow-hidden" aria-label="About hero section">
+            <!-- Background -->
+            <div class="absolute inset-0">
+                <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+                <!-- Grid Pattern -->
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,107,53,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,107,53,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
+                <div class="text-center max-w-4xl mx-auto">
+                    <!-- Page Title -->
+                    <div class="animate-fade-in-up opacity-0">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
+                            About <span class="text-orange-500">{{ data.site.name or 'Aesthetic Fitness Gym' }}</span>
+                        </h1>
+                    </div>
+                    
+                    <!-- Subtitle -->
+                    <div class="animate-fade-in-up opacity-0 [animation-delay:200ms]">
+                        <p class="text-sm sm:text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed px-2">
+                            Your premier destination for aesthetic fitness and body transformation in Joydevpur, Gazipur, Bangladesh
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="py-12 md:py-16 lg:py-20 bg-gray-900" aria-label="Our achievements">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Our <span class="text-orange-500">Achievements</span></h2>
+                    <p class="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2">Numbers that speak for our commitment to excellence</p>
+                </div>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-center hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                            <i class="fas fa-users text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <div class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-white mb-1 sm:mb-2">{{ data.stats.total_members or '100+' }}</div>
+                        <div class="text-gray-400 font-medium text-xs sm:text-sm">Happy Members</div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-center hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                            <i class="fas fa-user-tie text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <div class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-white mb-1 sm:mb-2">{{ data.stats.total_trainer or '5+' }}</div>
+                        <div class="text-gray-400 font-medium text-xs sm:text-sm">Expert Trainers</div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-center hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                            <i class="fas fa-trophy text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <div class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-white mb-1 sm:mb-2">{{ data.stats.success_rate or '98' }}%</div>
+                        <div class="text-gray-400 font-medium text-xs sm:text-sm">Success Rate</div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-center hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                            <i class="fas fa-clock text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <div class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-white mb-1 sm:mb-2">{{ data.stats.daily_operation_hours or '16' }}H</div>
+                        <div class="text-gray-400 font-medium text-xs sm:text-sm">Daily Hours</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Content Section -->
+        <section class="py-12 md:py-16 lg:py-20 bg-black" aria-label="About our story">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center max-w-7xl mx-auto">
+                    <!-- Content -->
+                    <div class="space-y-6 lg:space-y-8">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6">Our <span class="text-orange-500">Story</span></h2>
+                            <p class="text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed mb-4 md:mb-6">
+                                {{ data.site.description or 'Aesthetic Fitness Gym provides comprehensive fitness services and training programs. We offer personalized workout plans, nutrition guidance, and professional fitness coaching to help you achieve your aesthetic and health goals.' }}
+                            </p>
+                            {% if data.site.bn_description %}
+                            <p class="text-gray-400 text-sm sm:text-base leading-relaxed" lang="bn">
+                                {{ data.site.bn_description }}
+                            </p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Mission & Vision -->
+                        <div class="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                            <div class="bg-gray-900/50 border border-gray-700 rounded-xl lg:rounded-2xl p-4 sm:p-6">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4">
+                                    <i class="fas fa-bullseye text-black text-lg sm:text-xl"></i>
+                                </div>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Our Mission</h3>
+                                <p class="text-gray-400 text-xs sm:text-sm leading-relaxed">To empower individuals to achieve their fitness goals through personalized training, modern equipment, and unwavering support.</p>
+                            </div>
+                            
+                            <div class="bg-gray-900/50 border border-gray-700 rounded-xl lg:rounded-2xl p-4 sm:p-6">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4">
+                                    <i class="fas fa-eye text-black text-lg sm:text-xl"></i>
+                                </div>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Our Vision</h3>
+                                <p class="text-gray-400 text-xs sm:text-sm leading-relaxed">To be Bangladesh's leading fitness destination, inspiring a healthier and stronger community through innovative training methods.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Image/Logo -->
+                    <div class="flex justify-center lg:justify-end mt-8 lg:mt-0">
+                        <div class="relative">
+                            {% if data.site.logo %}
+                            <img src="{{ data.site.logo }}" alt="{{ data.site.name or 'Aesthetic Fitness Gym' }}" 
+                                 class="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 object-contain rounded-2xl lg:rounded-3xl shadow-2xl shadow-orange-500/25">
+                            {% else %}
+                            <div class="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-2xl lg:rounded-3xl flex items-center justify-center shadow-2xl shadow-orange-500/25">
+                                <i class="fas fa-dumbbell text-black text-6xl sm:text-7xl lg:text-8xl"></i>
+                            </div>
+                            {% endif %}
+                            <!-- Glowing effect -->
+                            <div class="absolute inset-0 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-2xl lg:rounded-3xl blur-3xl opacity-20 -z-10"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us Section -->
+        <section class="py-12 md:py-16 lg:py-20 bg-gray-900" aria-label="Why choose us">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Why Choose <span class="text-orange-500">Us</span>?</h2>
+                    <p class="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2">Discover what makes us the premier fitness destination in Gazipur</p>
+                </div>
+                
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl lg:rounded-2xl p-6 sm:p-8 hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                            <i class="fas fa-medal text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Expert Trainers</h3>
+                        <p class="text-gray-400 text-sm sm:text-base leading-relaxed">Certified professionals with years of experience in fitness training and body transformation.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl lg:rounded-2xl p-6 sm:p-8 hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                            <i class="fas fa-cogs text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Modern Equipment</h3>
+                        <p class="text-gray-400 text-sm sm:text-base leading-relaxed">State-of-the-art fitness equipment regularly maintained for optimal performance and safety.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl lg:rounded-2xl p-6 sm:p-8 hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                            <i class="fas fa-users text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Supportive Community</h3>
+                        <p class="text-gray-400 text-sm sm:text-base leading-relaxed">Join a motivating community of like-minded individuals on their fitness journey.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl lg:rounded-2xl p-6 sm:p-8 hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                            <i class="fas fa-calendar-alt text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Flexible Schedule</h3>
+                        <p class="text-gray-400 text-sm sm:text-base leading-relaxed">{{ data.stats.open_stats.days or 'Open daily' }} with extended hours {{ data.stats.open_stats.hours or '7:00 AM - 11:00 PM' }}.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl lg:rounded-2xl p-6 sm:p-8 hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                            <i class="fas fa-chart-line text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Proven Results</h3>
+                        <p class="text-gray-400 text-sm sm:text-base leading-relaxed">{{ data.stats.success_rate or '98' }}% success rate with personalized programs designed for your goals.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl lg:rounded-2xl p-6 sm:p-8 hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+                            <i class="fas fa-map-marker-alt text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Prime Location</h3>
+                        <p class="text-gray-400 text-sm sm:text-base leading-relaxed">Conveniently located at {{ data.site.location_address or 'F-224, M.rahaman complex, Gazipur' }} with easy access.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Operating Hours Section -->
+        <section class="py-12 md:py-16 lg:py-20 bg-black" aria-label="Operating hours">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-6 md:mb-8">Operating <span class="text-orange-500">Hours</span></h2>
+                    
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl lg:rounded-3xl p-6 sm:p-8 md:p-12">
+                        <div class="grid md:grid-cols-2 gap-6 sm:gap-8 items-center">
+                            <div>
+                                <div class="w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                                    <i class="fas fa-clock text-black text-2xl sm:text-2xl lg:text-3xl"></i>
+                                </div>
+                                <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">We're Open</h3>
+                                <p class="text-gray-400 text-base sm:text-lg">{{ data.stats.open_stats.days or 'Everyday' }}</p>
+                            </div>
+                            
+                            <div>
+                                <div class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-orange-500 mb-3 sm:mb-4">
+                                    {{ data.stats.open_stats.hours or '7:00 AM - 11:00 PM' }}
+                                </div>
+                                <p class="text-gray-400 text-sm sm:text-base">
+                                    {{ data.stats.daily_operation_hours or '16' }} hours daily dedicated to your fitness journey
+                                </p>
+                                <p class="text-gray-500 text-xs sm:text-sm mt-2">Timezone: {{ data.site.timezone or 'Asia/Dhaka' }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- View Full Schedule Button -->
+                        <div class="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-700">
+                            <a href="/schedule" 
+                               aria-label="View detailed training schedule"
+                               class="inline-flex items-center bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                                <i class="fas fa-calendar-alt mr-2" aria-hidden="true"></i>
+                                View Full Schedule
+                            </a>
+                            <p class="text-gray-500 text-xs sm:text-sm mt-2 sm:mt-3 px-2">See our detailed daily training hours and gender-specific sessions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-12 md:py-16 lg:py-20 xl:py-24 bg-gradient-to-r from-orange-500 to-yellow-500" aria-label="Call to action">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4 sm:mb-6 leading-tight">
+                        Start Your Fitness Journey Today
+                    </h2>
+                    
+                    <p class="text-black/80 text-sm sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-2">
+                        Join {{ data.stats.total_members or '100+' }}+ members who have transformed their lives with us
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center max-w-lg mx-auto">
+                        <a href="/pricing" 
+                           aria-label="View our pricing plans"
+                           class="w-full sm:w-auto bg-black hover:bg-gray-900 text-white px-6 sm:px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-sm sm:text-base md:text-lg transition-all duration-300 transform hover:scale-105">
+                            View Pricing
+                        </a>
+                        
+                        <a href="/contact" 
+                           aria-label="Contact us for more information"
+                           class="w-full sm:w-auto border-2 border-black/20 hover:border-black text-black hover:bg-black/10 px-6 sm:px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-sm sm:text-base md:text-lg transition-all duration-300">
+                            Get In Touch
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+        
+    <!-- Footer -->
+    {% include '/components/footer.html' %}
+    
+    <!-- Smooth scrolling -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

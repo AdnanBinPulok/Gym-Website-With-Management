@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>{{ data.site.name or 'Aesthetic Fitness Gym' }} - {{ data.site.tagline or 'Your Fitness Journey Starts Here' }}</title>
+    <meta name="description" content="{{ data.site.meta_description or 'Aesthetic Fitness Gym is the best place to achieve your fitness goals!' }}">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s ease-in-out infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-16 lg:pt-20">
+        <!-- Hero Section -->
+        <section id="home" class="relative h-[70vh] md:h-[60vh] flex items-center justify-center bg-black overflow-hidden p-4" aria-label="Hero section">
+            <!-- Simple Background -->
+            <div class="absolute inset-0">
+                {% if data.site.home_hero_bg_image %}
+                <!-- Background Image -->
+                <div class="absolute inset-0">
+                    <!-- Desktop Background -->
+                    <img src="{{ data.site.home_hero_bg_image }}" 
+                         alt="Gym background" 
+                         class="w-full h-full max-h-[100vh] object-cover {% if data.site.home_hero_bg_image_mobile %}hidden md:block{% endif %}"
+                         loading="eager">
+                    
+                    <!-- Mobile Background -->
+                    {% if data.site.home_hero_bg_image_mobile %}
+                    <img src="{{ data.site.home_hero_bg_image_mobile }}" 
+                         alt="Gym background mobile" 
+                         class="w-full h-full max-h-[100vh] object-cover block md:hidden"
+                         loading="eager">
+                    {% endif %}
+                    
+                    <div class="absolute inset-0 bg-black/60"></div>
+                </div>
+                {% else %}
+                <!-- Default Gradient Background -->
+                <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+                {% endif %}
+                
+                <!-- Minimal Grid Pattern -->
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,107,53,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,107,53,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-2 sm:px-3 lg:px-6 relative z-10">
+                <div class="text-center max-w-4xl mx-auto space-y-2 sm:space-y-3 md:space-y-4">
+                    
+                    <!-- Site Name -->
+                    <div class="animate-fade-in-up opacity-0">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-tight">
+                            {{ data.site.name or 'Aesthetic Fitness Gym' }}
+                        </h1>
+                    </div>
+                    
+                    <!-- Tagline -->
+                    <div class="animate-fade-in-up opacity-0 [animation-delay:200ms]">
+                        <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-orange-500 font-semibold">
+                            {{ data.site.tagline or 'Your Fitness Journey Starts Here' }}
+                        </p>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="animate-fade-in-up opacity-0 [animation-delay:400ms]">
+                        <p class="text-sm md:text-base lg:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed px-2">
+                            Join Joydevpur's premier fitness destination with expert trainers and modern equipment.
+                        </p>
+                    </div>
+                    
+                    <!-- CTA Buttons -->
+                    <div class="animate-fade-in-up opacity-0 [animation-delay:600ms] pt-1">
+                        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center max-w-md mx-auto">
+                            <a href="/pricing" 
+                               class="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-8 py-3 rounded-full font-bold text-base hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105">
+                                Join Now
+                            </a>
+                            
+                            <a href="/contact" 
+                               class="w-full sm:w-auto border-2 border-orange-500 text-orange-500 px-8 py-3 rounded-full font-bold text-base hover:bg-orange-500 hover:text-black transition-all duration-300">
+                                Contact Us
+                            </a>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        {% if data.gallery and data.gallery|length > 0 %}
+        <section id="gallery" class="py-12 md:py-16 lg:py-24 bg-gray-900" aria-label="Gym gallery">
+            <div class="container mx-auto px-2 sm:px-3 lg:px-6">
+                <div class="text-center mb-10 md:mb-12">
+                    <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Our <span class="text-orange-500">Gallery</span></h2>
+                    <p class="text-gray-400 text-sm md:text-base lg:text-lg max-w-2xl mx-auto">Take a look at our state-of-the-art facilities and equipment</p>
+                </div>
+                
+                <!-- Simple Gallery Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
+                    {% for image in data.gallery %}
+                    {% if loop.index <= 6 %}
+                    <div class="group relative overflow-hidden rounded-xl border border-gray-700 hover:border-orange-500/50 transition-all duration-300">
+                        <div class="aspect-w-16 aspect-h-10 h-48 md:h-64">
+                            <img src="{{ image }}" 
+                                 alt="Aesthetic Fitness Gym Gallery Image {{ loop.index }}" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                 loading="lazy">
+                        </div>
+                        
+                        <!-- View Button -->
+                        <div class="absolute top-2 right-2 z-10">
+                            <a href="{{ image }}" target="_blank" rel="noopener noreferrer" 
+                               class="w-8 h-8 bg-black/70 hover:bg-orange-500 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110"
+                               onclick="event.stopPropagation(); window.open('{{ image }}', '_blank');">
+                                <i class="fas fa-external-link-alt text-white text-xs"></i>
+                            </a>
+                        </div>
+                        
+                        <!-- Overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="absolute bottom-0 left-0 right-0 p-6">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-white font-semibold text-lg mb-1">{{ data.site.name or 'Aesthetic Fitness Gym' }}</h3>
+                                        <p class="text-gray-300 text-sm">Professional Fitness Facility</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <!-- View Gallery Button -->
+                {% if data.gallery|length > 6 %}
+                <div class="text-center mt-6 md:mt-8">
+                    <a href="/gallery" 
+                       class="inline-flex items-center bg-gray-800/50 border border-gray-700 hover:border-orange-500/50 text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-800/70 transition-all duration-300 transform hover:scale-105"
+                       aria-label="View full gallery with {{ data.gallery|length }} photos">
+                        <i class="fas fa-images mr-2" aria-hidden="true"></i>
+                        View Full Gallery ({{ data.gallery|length }} Photos)
+                    </a>
+                </div>
+                {% endif %}
+                
+                <!-- Gallery CTA -->
+                <div class="text-center mt-8 md:mt-10">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        {% if data.gallery|length > 6 %}
+                        <a href="/gallery" 
+                           class="inline-flex items-center bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black"
+                           aria-label="View full gallery with {{ data.gallery|length }} photos">
+                            <i class="fas fa-images mr-2" aria-hidden="true"></i>
+                            View Full Gallery ({{ data.gallery|length }} Photos)
+                        </a>
+                        {% endif %}
+                        <a href="#location" 
+                           class="inline-flex items-center border-2 border-orange-500 text-orange-500 px-8 py-3 rounded-full font-semibold hover:bg-orange-500 hover:text-black transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black"
+                           aria-label="Visit our location">
+                            <i class="fas fa-map-marker-alt mr-2" aria-hidden="true"></i>
+                            Visit Our Location
+                        </a>
+                    </div>
+                    {% if data.gallery|length <= 6 %}
+                    <p class="text-gray-400 mt-4">Want to see more? Visit us in person!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Programs Section -->
+        <section id="programs" class="py-12 md:py-16 lg:py-20 {% if data.gallery and data.gallery|length > 0 %}bg-black{% else %}bg-gray-900{% endif %}" aria-label="Training programs">
+            <div class="container mx-auto px-2 sm:px-3 lg:px-6">
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Training <span class="text-orange-500">Programs</span></h2>
+                    <p class="text-gray-400 text-sm md:text-base lg:text-lg max-w-2xl mx-auto">Tailored programs designed to achieve your specific fitness goals</p>
+                </div>
+                
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mb-4">
+                            <i class="fas fa-fire text-black text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Fat Loss</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">High-intensity workouts designed to maximize calorie burn</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mb-4">
+                            <i class="fas fa-fist-raised text-black text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Strength Building</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Progressive programs to build raw strength and muscle mass</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 hover:scale-105 transition-transform duration-300 sm:col-span-2 lg:col-span-1">
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mb-4">
+                            <i class="fas fa-heart text-black text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Conditioning</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Improve cardiovascular health and athletic performance</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schedule Section -->
+        <section id="schedule" class="py-6 md:py-8 lg:py-12 {% if data.gallery and data.gallery|length > 0 %}bg-gray-900{% else %}bg-black{% endif %}" aria-label="Training schedule">
+            <div class="container mx-auto px-2 sm:px-3 lg:px-6">
+                <div class="text-center mb-4 md:mb-6">
+                    <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-3">Training <span class="text-orange-500">Schedule</span></h2>
+                    <p class="text-gray-400 text-sm md:text-base max-w-2xl mx-auto">Plan your workouts with our training hours</p>
+                </div>
+                
+                <div class="max-w-5xl mx-auto">
+                    <!-- Mobile Schedule (Collapsible) -->
+                    <div class="block lg:hidden space-y-3">
+                        <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-3">
+                            <div class="flex justify-between items-center mb-3 p-2 bg-gray-700/30 rounded-lg border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
+                                <h3 class="text-base font-bold text-white">Quick Schedule</h3>
+                                <button id="schedule-toggle" class="text-orange-500 hover:text-orange-400 transition-all duration-300 hover:scale-110 bg-orange-500/10 hover:bg-orange-500/20 p-2 rounded-full border border-orange-500/30 hover:border-orange-500">
+                                    <i class="fas fa-chevron-down text-sm transition-transform duration-300" id="schedule-icon"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Add visual indicator -->
+                            <div class="text-center mb-3">
+                                <p class="text-xs text-gray-400 flex items-center justify-center space-x-2">
+                                    <i class="fas fa-info-circle text-orange-500"></i>
+                                    <span>Tap the arrow above for detailed schedule</span>
+                                </p>
+                            </div>
+
+                            <!-- Quick Overview -->
+                            <div class="space-y-2 mb-3">
+                                {% set days_groups = [
+                                    {'label': 'Mon - Thu', 'days': ['monday', 'tuesday', 'wednesday', 'thursday']},
+                                    {'label': 'Friday', 'days': ['friday']},
+                                    {'label': 'Sat - Sun', 'days': ['saturday', 'sunday']}
+                                ] %}
+                                
+                                {% for group in days_groups %}
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-gray-300">{{ group.label }}</span>
+                                    {% if group.days|length == 1 and group.days[0] == 'friday' %}
+                                        {% if data.schedule.friday %}
+                                            {% set open_slots = data.schedule.friday | selectattr('is_open', 'equalto', true) | list %}
+                                            {% if open_slots|length > 0 %}
+                                                {% set first_slot = open_slots[0] %}
+                                                {% set last_slot = open_slots[-1] %}
+                                                <span class="text-yellow-400 font-semibold">{{ first_slot.start_time }} - {{ last_slot.end_time }} (Male Only)</span>
+                                            {% else %}
+                                                <span class="text-red-400 font-semibold">Closed</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-red-400 font-semibold">Closed</span>
+                                        {% endif %}
+                                    {% else %}
+                                        {% set sample_day = group.days[0] %}
+                                        {% if data.schedule[sample_day] %}
+                                            {% set open_slots = data.schedule[sample_day] | selectattr('is_open', 'equalto', true) | list %}
+                                            {% if open_slots|length > 0 %}
+                                                {% set first_slot = open_slots[0] %}
+                                                {% set last_slot = open_slots[-1] %}
+                                                <span class="text-orange-500 font-semibold">{{ first_slot.start_time }} - {{ last_slot.end_time }}</span>
+                                            {% else %}
+                                                <span class="text-red-400 font-semibold">Closed</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-red-400 font-semibold">Closed</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Collapsible Detailed Schedule -->
+                            <div id="detailed-schedule" class="hidden transition-all duration-300 ease-in-out">
+                                <!-- Add header to make it clear what expanded -->
+                                <div class="bg-orange-500/10 border border-orange-500/30 rounded-lg p-2 mb-3">
+                                    <p class="text-center text-xs text-orange-400 font-medium">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        Detailed Weekly Schedule
+                                    </p>
+                                </div>
+                                
+                                <div class="border-t border-gray-700 pt-3 space-y-2">
+                                    {% set days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+                                    {% set day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                                    
+                                    {% for day in days %}
+                                    <div class="bg-gray-700/30 rounded-lg p-2">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <h4 class="text-sm font-bold text-white">{{ day_names[loop.index0] }}</h4>
+                                            {% if data.schedule[day] %}
+                                                {% set open_slots = data.schedule[day] | selectattr('is_open', 'equalto', true) | list %}
+                                                {% if open_slots|length > 0 %}
+                                                <div class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-check text-white text-xs"></i>
+                                                </div>
+                                                {% else %}
+                                                <div class="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-times text-white text-xs"></i>
+                                                </div>
+                                                {% endif %}
+                                            {% else %}
+                                            <div class="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-times text-white text-xs"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        {% if data.schedule[day] %}
+                                        <div class="space-y-1">
+                                            {% for slot in data.schedule[day] %}
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-xs px-2 py-0.5 rounded-full
+                                                    {% if slot.gender == 'male' %}bg-blue-500/20 text-blue-300
+                                                    {% elif slot.gender == 'female' %}bg-pink-500/20 text-pink-300
+                                                    {% else %}bg-orange-500/20 text-orange-300{% endif %}
+                                                    {% if not slot.is_open %}opacity-50{% endif %}">
+                                                    {% if slot.gender == 'male' %}
+                                                        <i class="fas fa-mars mr-1"></i>Male
+                                                    {% elif slot.gender == 'female' %}
+                                                        <i class="fas fa-venus mr-1"></i>Female
+                                                    {% else %}
+                                                        <i class="fas fa-users mr-1"></i>Mixed
+                                                    {% endif %}
+                                                </span>
+                                                <span class="text-xs font-medium
+                                                    {% if slot.is_open %}text-white
+                                                    {% else %}text-red-400 line-through{% endif %}">
+                                                    {{ slot.start_time }} - {{ slot.end_time }}
+                                                    {% if not slot.is_open %}<span class="ml-1 text-red-400">(Closed)</span>{% endif %}
+                                                </span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% else %}
+                                        <div class="text-center py-1">
+                                            <p class="text-red-400 text-xs font-medium">Closed - Rest Day</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <!-- Legend -->
+                                <div class="border-t border-gray-700 pt-3 mt-3">
+                                    <h5 class="text-xs font-bold text-white mb-2">Schedule Legend</h5>
+                                    <div class="grid grid-cols-3 gap-2 text-xs">
+                                        <div class="text-center">
+                                            <div class="w-5 h-5 bg-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-1">
+                                                <i class="fas fa-mars text-blue-300 text-xs"></i>
+                                            </div>
+                                            <span class="text-gray-400">Male</span>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="w-5 h-5 bg-pink-500/20 rounded-lg flex items-center justify-center mx-auto mb-1">
+                                                <i class="fas fa-venus text-pink-300 text-xs"></i>
+                                            </div>
+                                            <span class="text-gray-400">Female</span>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="w-5 h-5 bg-orange-500/20 rounded-lg flex items-center justify-center mx-auto mb-1">
+                                                <i class="fas fa-users text-orange-300 text-xs"></i>
+                                            </div>
+                                            <span class="text-gray-400">Mixed</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 pt-3 border-t border-gray-700 text-center bg-gray-700/20 rounded-lg p-3">
+                                <p class="text-xs text-gray-400 mb-2">Need more details about our schedule?</p>
+                                <a href="{{ data.site.contact.whatsapp or '' }}" 
+                                   target="_blank"
+                                   class="inline-flex items-center bg-orange-500 hover:bg-orange-600 text-black px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-lg shadow-orange-500/25">
+                                    <i class="fab fa-whatsapp mr-2"></i>Get Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Desktop Schedule (Full Grid) -->
+                    <div class="hidden lg:block">
+                        <div class="grid grid-cols-7 gap-2">
+                            {% set days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+                            {% set day_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] %}
+                            
+                            {% for day in days %}
+                            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-3 text-center hover:bg-gray-800/70 transition-all duration-300">
+                                <h3 class="text-sm font-bold text-white mb-2">{{ day_names[loop.index0] }}</h3>
+                                {% if data.schedule[day] %}
+                                    {% set open_slots = data.schedule[day] | selectattr('is_open', 'equalto', true) | list %}
+                                    {% if open_slots|length == 0 %}
+                                    <div class="py-3">
+                                        <i class="fas fa-bed text-gray-500 text-xl mb-1"></i>
+                                        <p class="text-red-400 text-xs font-medium">Closed</p>
+                                    </div>
+                                    {% else %}
+                                    <div class="space-y-1">
+                                        {% for slot in data.schedule[day] %}
+                                        <div class="rounded-lg py-1
+                                            {% if slot.gender == 'male' %}bg-blue-500/20
+                                            {% elif slot.gender == 'female' %}bg-pink-500/20
+                                            {% else %}bg-orange-500/20{% endif %}
+                                            {% if not slot.is_open %}opacity-40{% endif %}">
+                                            <div class="text-xs font-medium mb-0.5
+                                                {% if slot.gender == 'male' %}text-blue-300
+                                                {% elif slot.gender == 'female' %}text-pink-300
+                                                {% else %}text-orange-300{% endif %}">
+                                                {% if slot.gender == 'male' %}
+                                                    <i class="fas fa-mars mr-1"></i>Male
+                                                {% elif slot.gender == 'female' %}
+                                                    <i class="fas fa-venus mr-1"></i>Female
+                                                {% else %}
+                                                    <i class="fas fa-users mr-1"></i>Mixed
+                                                {% endif %}
+                                            </div>
+                                            <div class="text-xs {% if slot.is_open %}text-white{% else %}text-red-400 line-through{% endif %}">
+                                                {{ slot.start_time|replace(' ', '')|replace(':00', '') }}-{{ slot.end_time|replace(' ', '')|replace(':00', '') }}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                {% else %}
+                                <div class="py-3">
+                                    <i class="fas fa-bed text-gray-500 text-xl mb-1"></i>
+                                    <p class="text-red-400 text-xs font-medium">Closed</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Desktop Legend -->
+                        <div class="mt-6 bg-gray-800/30 border border-gray-700 rounded-2xl p-4">
+                            <h4 class="text-lg font-bold text-white mb-3 text-center">Schedule Legend</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-mars text-blue-300 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-white font-semibold text-sm">Male Hours</h5>
+                                        <p class="text-gray-400 text-xs">Dedicated training time for men</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 bg-pink-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-venus text-pink-300 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-white font-semibold text-sm">Female Hours</h5>
+                                        <p class="text-gray-400 text-xs">Dedicated training time for women</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-users text-orange-300 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-white font-semibold text-sm">Mixed Hours</h5>
+                                        <p class="text-gray-400 text-xs">Open for all members</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Stats -->
+                            <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-700">
+                                <div class="text-center">
+                                    <div class="text-lg font-bold text-orange-500 mb-1">6 Days</div>
+                                    <div class="text-gray-400 text-sm">Open Per Week</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-lg font-bold text-orange-500 mb-1">Variable</div>
+                                    <div class="text-gray-400 text-sm">Daily Hours</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Location & Map Section -->
+        <section id="location" class="py-12 md:py-16 lg:py-24 {% if data.gallery and data.gallery|length > 0 %}bg-black{% else %}bg-gray-900{% endif %}" aria-label="Gym location">
+            <div class="container mx-auto px-2 sm:px-3 lg:px-6">
+                <div class="text-center mb-10 md:mb-12">
+                    <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Visit Our <span class="text-orange-500">Location</span></h2>
+                    <p class="text-gray-400 text-sm md:text-base lg:text-lg max-w-2xl mx-auto">Come and experience our world-class facilities in person</p>
+                </div>
+                
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- Location Info -->
+                    <div class="space-y-8">
+                        <div class="bg-gray-800/50 border border-gray-700 rounded-3xl p-8">
+                            <div class="flex items-start space-x-4 mb-6">
+                                <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-map-marker-alt text-black text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-white mb-2">Our Address</h3>
+                                    <p class="text-gray-300 text-lg leading-relaxed">{{ data.site.location_address or 'F-224, M.rahaman complex, Gazipur' }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-2 gap-6 mt-8">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-phone text-orange-500"></i>
+                                    <a href="tel:{{ data.site.contact.phone or '+8801670442072' }}" class="text-gray-300 hover:text-orange-500 transition-colors duration-300">
+                                        {{ data.site.contact.phone or '+880 167 044 2072' }}
+                                    </a>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-envelope text-orange-500"></i>
+                                    <a href="mailto:{{ data.site.contact.email or 'astheticfitnessclub2022@gmail.com' }}" class="text-gray-300 hover:text-orange-500 transition-colors duration-300 text-sm">
+                                        {{ data.site.contact.email or 'astheticfitnessclub2022@gmail.com' }}
+                                    </a>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3">
+                                    <i class="fab fa-whatsapp text-orange-500"></i>
+                                    <a href="{{ data.site.contact.whatsapp or '' }}" target="_blank" class="text-gray-300 hover:text-orange-500 transition-colors duration-300">
+                                        <h1 class="text-sm font-semibold">WhatsApp Us</h1>
+                                        <span class="text-xs text-gray-400">{{ data.site.contact.whatsapp or '+880 133 953 9243' }}</span>
+                                    </a>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-clock text-orange-500"></i>
+                                    <div class="text-gray-300">
+                                        <p class="text-sm">{{ data.stats.open_stats.days or 'Mon-Fri' }}</p>
+                                        <p class="text-xs text-gray-400">{{ data.stats.open_stats.hours or '7AM-11PM' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4 mt-8">
+                                <a href="{{ data.site.location_link or 'https://maps.app.goo.gl/oV6P2uiy1TjgwixD8' }}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer"
+                                   aria-label="Get directions to our gym"
+                                   class="flex-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-6 py-3 rounded-full font-semibold text-center hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                                    <i class="fas fa-directions mr-2" aria-hidden="true"></i>Get Directions
+                                </a>
+                                <a href="{{ data.site.contact.whatsapp or '' }}" 
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   aria-label="Contact us on WhatsApp"
+                                   class="flex-1 border-2 border-orange-500 text-orange-500 px-6 py-3 rounded-full font-semibold text-center hover:bg-orange-500 hover:text-black transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                                    <i class="fab fa-whatsapp mr-2" aria-hidden="true"></i>Contact Us
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Interactive Map -->
+                    <div class="relative bg-gray-800/50 border border-gray-700 rounded-2xl overflow-hidden">
+                        <div class="aspect-w-16 aspect-h-12 h-96 lg:h-[500px]" role="region" aria-label="Interactive map showing gym location">
+                            {% include '/components/location_map.html' %}
+                        </div>
+                        
+                        <!-- Map Overlay Info -->
+                        <div class="absolute top-4 right-4 bg-black/80 rounded-2xl p-4 max-w-xs">
+                            <div class="flex items-center space-x-3">
+                                <div>
+                                    <p class="text-white font-semibold text-sm">{{ data.site.name or 'Aesthetic Fitness Gym' }}</p>
+                                    <p class="text-gray-400 text-xs">Gazipur, Bangladesh</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Logo in top-left -->
+                    </div>
+                </div>
+                
+                <!-- Location Features -->
+                <div class="grid md:grid-cols-2 gap-6 mt-16">
+                    <div class="bg-gray-800/30 border border-gray-700 rounded-2xl p-6 text-center hover:bg-gray-800/50 transition-all duration-300">
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-bus text-black"></i>
+                        </div>
+                        <h4 class="text-white font-semibold mb-2">Easy Access</h4>
+                        <p class="text-gray-400 text-sm">Convenient location with public transport access</p>
+                    </div>
+                    
+                    <div class="bg-gray-800/30 border border-gray-700 rounded-2xl p-6 text-center hover:bg-gray-800/50 transition-all duration-300">
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-shield-alt text-black"></i>
+                        </div>
+                        <h4 class="text-white font-semibold mb-2">Safe Area</h4>
+                        <p class="text-gray-400 text-sm">Located in a secure and well-lit area</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-16 md:py-20 lg:py-24 bg-gradient-to-r from-orange-500 to-yellow-500" aria-label="Call to action">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl mx-auto text-center">
+                    <!-- Main Heading -->
+                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-6 leading-tight">
+                        Ready to Transform Your Body?
+                    </h2>
+                    
+                    <!-- Description -->
+                    <p class="text-black/80 text-lg md:text-xl mb-8 max-w-2xl mx-auto leading-relaxed">
+                        Join hundreds of members who have already achieved their fitness goals with our expert guidance
+                    </p>
+                    
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto">
+                        <a href="/pricing" 
+                           aria-label="Get started today - View our pricing"
+                           class="w-full sm:w-auto bg-black hover:bg-gray-900 text-white px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-base md:text-lg transition-all duration-300 transform hover:scale-105">
+                            Get Started Today
+                        </a>
+                        
+                        <!-- <a href="/contact" 
+                           aria-label="Contact us for more information"
+                           class="w-full sm:w-auto border-2 border-black/20 hover:border-black text-black hover:bg-black/10 px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-base md:text-lg transition-all duration-300">
+                            Free Consultation
+                        </a> -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEO Content Section -->
+        <section class="py-8 md:py-12 bg-gray-900" aria-label="About our gym">
+            <div class="container mx-auto px-2 sm:px-3 lg:px-6">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h1 class="text-2xl md:text-3xl font-bold text-white mb-6">{{ data.site.name or 'Aesthetic Fitness Gym' }}</h1>
+                    
+                    {% if data.site.description %}
+                    <div class="mb-6">
+                        <p class="text-gray-300 leading-relaxed text-sm md:text-base">{{ data.site.description }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if data.site.bn_description %}
+                    <div class="mb-6">
+                        <p class="text-gray-400 leading-relaxed text-sm" lang="bn">{{ data.site.bn_description }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Default SEO Content if no descriptions provided -->
+                    {% if not data.site.description and not data.site.bn_description %}
+                    <div class="grid md:grid-cols-2 gap-6 text-left">
+                        <div>
+                            <h3 class="text-lg font-semibold text-orange-500 mb-3">About Our Gym</h3>
+                            <p class="text-gray-300 text-sm leading-relaxed">
+                                {{ data.site.name or 'Aesthetic Fitness Gym' }} is a premier fitness facility located in Gazipur, Bangladesh. 
+                                We offer state-of-the-art equipment, expert personal training, and a supportive community environment 
+                                to help you achieve your fitness goals.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-orange-500 mb-3">Our Services</h3>
+                            <p class="text-gray-300 text-sm leading-relaxed">
+                                Our comprehensive fitness programs include strength training, cardio workouts, fat loss programs, 
+                                muscle building, and conditioning. We provide separate training hours for male and female members 
+                                along with mixed training sessions.
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+        
+    <!-- Footer -->
+    {% include '/components/footer.html' %}
+    
+    <!-- Add smooth scrolling behavior -->
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Lazy loading for images
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+        
+        // Collapsible Schedule Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const scheduleToggle = document.getElementById('schedule-toggle');
+            const detailedSchedule = document.getElementById('detailed-schedule');
+            const scheduleIcon = document.getElementById('schedule-icon');
+            
+            if (scheduleToggle && detailedSchedule && scheduleIcon) {
+                scheduleToggle.addEventListener('click', function() {
+                    detailedSchedule.classList.toggle('hidden');
+                    
+                    if (detailedSchedule.classList.contains('hidden')) {
+                        scheduleIcon.classList.remove('fa-chevron-up');
+                        scheduleIcon.classList.add('fa-chevron-down');
+                    } else {
+                        scheduleIcon.classList.remove('fa-chevron-down');
+                        scheduleIcon.classList.add('fa-chevron-up');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

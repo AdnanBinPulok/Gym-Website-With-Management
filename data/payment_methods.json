@@ -1,0 +1,18 @@
+[
+    {
+        "id": "bkash",
+        "name": "Bkash",
+        "icon": "https://media.gliders.dev/file/view/6e5edccf-e158-48f1-a581-8bd2435cccc5.png",
+        "number": "0100000000",
+        "type": "personal",
+        "note": "Please use this number for payment."
+    },
+    {
+        "id": "nagad",
+        "name": "Nagad",
+        "icon": "https://media.gliders.dev/file/view/f0956ece-8fb8-4484-9b8a-60980eeeccd1.png",
+        "number": "0100000000",
+        "type": "personal",
+        "note": "Please use this number for payment."
+    }
+]

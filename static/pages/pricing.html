@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>Membership Plans - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <meta name="description" content="Explore our membership plans and pricing options for {{ data.site.name or 'Aesthetic Fitness Gym' }}.">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-20">
+        <!-- Hero Section -->
+        <section class="py-16 bg-black">
+            <div class="container mx-auto px-4">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                        Membership <span class="text-orange-500">Plans</span>
+                    </h1>
+                    <p class="text-lg text-gray-400">
+                        Choose the perfect plan for your fitness journey
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Cards -->
+        <section class="bg-gray-900 py-2 md:py-4 lg:py-8">
+            <div class="container mx-auto px-4">
+                {% if data.subscriptions_plans.subscriptions_plans %}
+                <!-- Add padding-top to container to accommodate badges -->
+                <div class="pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 max-w-7xl mx-auto">
+                    {% for plan in data.subscriptions_plans.subscriptions_plans %}
+                    <div class="bg-gray-800 rounded-2xl p-6 md:p-8 relative hover:bg-gray-750 transition-colors duration-300 flex flex-col
+                        {% if plan.popular %}border-2 border-orange-500{% else %}border border-gray-700{% endif %}">
+                        
+                        <!-- Popular Badge -->
+                        {% if plan.popular %}
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
+                            <span class="bg-orange-500 text-black px-3 py-1 rounded-full text-xs font-bold shadow-lg whitespace-nowrap">
+                                Most Popular
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Best Value Badge -->
+                        {% if plan.best_value %}
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg whitespace-nowrap">
+                                Best Value
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Plan Header -->
+                        <div class="text-center mb-6 {% if plan.popular or plan.best_value %}mt-2{% else %}mt-0{% endif %}">
+                            <h3 class="text-xl md:text-2xl font-bold text-white mb-2">{{ plan.name }}</h3>
+                            <div class="flex items-center justify-center mb-2">
+                                <span class="text-orange-500 text-lg mr-1">{{ data.site.currency.symbol or '৳' }}</span>
+                                <span class="text-3xl md:text-4xl font-bold text-white">{{ plan.final_fee }}</span>
+                                <span class="text-orange-400 text-sm ml-2 font-semibold border border-orange-500/30 bg-orange-500/10 px-2 py-1 rounded-full">/{{ plan.cycle }}</span>
+                            </div>
+                            {% if plan.description %}
+                            <p class="text-gray-400 text-sm mt-3">{{ plan.description }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Features -->
+                        <div class="space-y-4 mb-8 flex-1">
+                            <!-- Admission Fee -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300 text-sm">Admission Fee</span>
+                                {% if plan.final_admission_fee|int > 0 %}
+                                    <span class="text-orange-500 font-semibold text-sm">{{ data.site.currency.symbol or '৳' }}{{ plan.final_admission_fee }}</span>
+                                {% else %}
+                                    <span class="text-green-400 font-semibold text-sm">FREE</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Gym Access -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300 text-sm">Gym Access</span>
+                                {% if plan.features.gym_access %}
+                                    <i class="fas fa-check text-green-400"></i>
+                                {% else %}
+                                    <i class="fas fa-times text-red-400"></i>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Equipment -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300 text-sm">Equipment Access</span>
+                                {% if plan.features.equipment_access %}
+                                    <i class="fas fa-check text-green-400"></i>
+                                {% else %}
+                                    <i class="fas fa-times text-red-400"></i>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Locker -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300 text-sm">Basic Locker</span>
+                                {% if plan.features.locker_access %}
+                                    <i class="fas fa-check text-green-400"></i>
+                                {% else %}
+                                    <i class="fas fa-times text-red-400"></i>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- PT Sessions -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300 text-sm">PT Sessions</span>
+                                {% if plan.features.pt_sessions > 0 %}
+                                    <span class="text-green-400 font-semibold text-sm">{{ plan.features.pt_sessions }} Free</span>
+                                {% else %}
+                                    <i class="fas fa-times text-red-400"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- CTA Button -->
+                        <a href="{{ data.site.contact.whatsapp or '' }}" target="_blank" 
+                           class="block w-full {% if plan.popular or plan.best_value %}bg-orange-500 hover:bg-orange-600{% else %}bg-gray-700 hover:bg-gray-600{% endif %} text-center py-3 rounded-lg font-semibold transition-colors duration-300">
+                            Choose Plan
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Premium Locker Section -->
+        {% if data.subscriptions_plans.locker_access %}
+        <section class="py-16 bg-black">
+            <div class="container mx-auto px-4">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                            Premium <span class="text-orange-500">Locker Access</span>
+                        </h2>
+                        <p class="text-lg text-gray-400">
+                            {{ data.subscriptions_plans.locker_access.description }}
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-2xl p-8 md:p-12">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <!-- Features -->
+                            <div>
+                                <h3 class="text-2xl font-bold text-white mb-6">{{ data.subscriptions_plans.locker_access.name }}</h3>
+                                <div class="space-y-4">
+                                    {% for feature in data.subscriptions_plans.locker_access.features %}
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-orange-500 mr-3"></i>
+                                        <span class="text-gray-300">{{ feature }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Pricing -->
+                            <div class="text-center">
+                                <div class="bg-gray-700 rounded-xl p-6">
+                                    <div class="mb-4">
+                                        <div class="flex items-center justify-center">
+                                            <span class="text-orange-500 text-lg mr-1">{{ data.site.currency.symbol or '৳' }}</span>
+                                            <span class="text-3xl font-bold text-white">{{ data.subscriptions_plans.locker_access.price }}</span>
+                                            <span class="text-orange-400 text-sm ml-2 font-semibold border border-orange-500/30 bg-orange-500/10 px-2 py-1 rounded-full">/{{ data.subscriptions_plans.locker_access.cycle }}</span>
+                                        </div>
+                                        <p class="text-blue-400 text-sm mt-2">Premium Service</p>
+                                    </div>
+                                    
+                                    <a href="{{ data.site.contact.whatsapp or '' }}" target="_blank" 
+                                       class="block w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition-colors duration-300">
+                                        <i class="fas fa-lock mr-2"></i>Get Premium Locker
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Personal Training -->
+        <section class="py-16 {% if data.subscriptions_plans.locker_access %}bg-gray-900{% else %}bg-black{% endif %}">
+            <div class="container mx-auto px-4">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                            Personal <span class="text-orange-500">Training</span>
+                        </h2>
+                        <p class="text-lg text-gray-400">
+                            {{ data.subscriptions_plans.personal_training.description or 'One-on-one training sessions with expert trainers' }}
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-2xl p-8 md:p-12">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <!-- Features -->
+                            <div>
+                                <h3 class="text-2xl font-bold text-white mb-6">{{ data.subscriptions_plans.personal_training.name }}</h3>
+                                <div class="space-y-4">
+                                    {% if data.subscriptions_plans.personal_training.features %}
+                                        {% for feature in data.subscriptions_plans.personal_training.features %}
+                                        <div class="flex items-center">
+                                            <i class="fas fa-check text-orange-500 mr-3"></i>
+                                            <span class="text-gray-300">{{ feature }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-orange-500 mr-3"></i>
+                                        <span class="text-gray-300">Personalized Workout Plans</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-orange-500 mr-3"></i>
+                                        <span class="text-gray-300">Form Correction & Technique</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-orange-500 mr-3"></i>
+                                        <span class="text-gray-300">Nutrition Guidance</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-orange-500 mr-3"></i>
+                                        <span class="text-gray-300">Goal-specific Programming</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Pricing -->
+                            <div class="text-center">
+                                <div class="bg-gray-700 rounded-xl p-6">
+                                    {% if data.subscriptions_plans.personal_training.fixed %}
+                                    <div class="mb-4">
+                                        <div class="flex items-center justify-center">
+                                            <span class="text-orange-500 text-lg mr-1">{{ data.site.currency.symbol or '৳' }}</span>
+                                            <span class="text-3xl font-bold text-white">{{ data.subscriptions_plans.personal_training.final_fee }}</span>
+                                            <span class="text-orange-400 text-sm ml-2 font-semibold border border-orange-500/30 bg-orange-500/10 px-2 py-1 rounded-full">/{{ data.subscriptions_plans.personal_training.cycle }}</span>
+                                        </div>
+                                        <p class="text-green-400 text-sm mt-2">Fixed Rate</p>
+                                    </div>
+                                    {% else %}
+                                    <div class="mb-4">
+                                        <i class="fas fa-calculator text-orange-500 text-3xl mb-3"></i>
+                                        <h4 class="text-xl font-bold text-white mb-2">Custom Pricing</h4>
+                                        <p class="text-gray-400 text-sm">Based on your requirements</p>
+                                        <p class="text-orange-400 text-sm mt-2 font-semibold border border-orange-500/30 bg-orange-500/10 px-2 py-1 rounded-full inline-block">Per {{ data.subscriptions_plans.personal_training.cycle }}</p>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <a href="{{ data.site.contact.whatsapp or '' }}" target="_blank" 
+                                       class="block w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition-colors duration-300">
+                                        <i class="fab fa-whatsapp mr-2"></i>Get Quote
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="py-12 md:py-16 bg-black" aria-label="Frequently asked questions">
+            <div class="container mx-auto px-3 sm:px-4 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3">Frequently Asked <span class="text-orange-500">Questions</span></h2>
+                    <p class="text-gray-400 text-sm md:text-base max-w-2xl mx-auto">Find answers to commonly asked questions about our memberships</p>
+                </div>
+                
+                <div class="max-w-3xl mx-auto">
+                    <div class="space-y-4">
+                        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 md:p-6">
+                            <h3 class="text-lg font-semibold text-white mb-2">Can I freeze my membership?</h3>
+                            <p class="text-gray-400 text-sm">Yes, you can freeze your membership for a valid reason (like medical issues or travel) for up to 30 days per year. Please contact our staff for details.</p>
+                        </div>
+                        
+                        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 md:p-6">
+                            <h3 class="text-lg font-semibold text-white mb-2">Is there a cancellation fee?</h3>
+                            <p class="text-gray-400 text-sm">Monthly memberships can be canceled with 15 days notice. Longer-term memberships have different policies. Please check with our staff for specific details.</p>
+                        </div>
+                        
+                        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 md:p-6">
+                            <h3 class="text-lg font-semibold text-white mb-2">Do you offer athlete discounts?</h3>
+                            <p class="text-gray-400 text-sm">Yes, we offer special rates for competitive athletes and sports professionals. Please bring proof of your athletic status and inquire at our reception for current athlete discounts.</p>
+                        </div>
+                        
+                        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 md:p-6">
+                            <h3 class="text-lg font-semibold text-white mb-2">What's included in my membership?</h3>
+                            <p class="text-gray-400 text-sm">All memberships include access to our gym facilities and equipment during regular operating hours. Some plans include additional benefits like fitness assessments and personal training sessions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact & Location Section -->
+        <section class="py-12 md:py-16 bg-gray-900" aria-label="Contact us">
+            <div class="container mx-auto px-3 sm:px-4 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3">Get in <span class="text-orange-500">Touch</span></h2>
+                    <p class="text-gray-400 text-sm md:text-base max-w-2xl mx-auto">Have questions about our membership plans? Contact us for more information</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center max-w-6xl mx-auto">
+                    <!-- Contact Info -->
+                    <div class="space-y-8">
+                        <div class="bg-gray-800/50 border border-gray-700 rounded-3xl p-6 md:p-8">
+                            <div class="flex items-center space-x-4 mb-6">
+                                <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-phone text-black text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white mb-1">Contact Us</h3>
+                                    <p class="text-gray-400">Reach out to our friendly staff</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-phone text-orange-500"></i>
+                                    <a href="tel:{{ data.site.contact.phone or '+8801670442072' }}" class="text-gray-300 hover:text-orange-500 transition-colors duration-300">
+                                        {{ data.site.contact.phone or '+880 167 044 2072' }}
+                                    </a>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-envelope text-orange-500"></i>
+                                    <a href="mailto:{{ data.site.contact.email or 'astheticfitnessclub2022@gmail.com' }}" class="text-gray-300 hover:text-orange-500 transition-colors duration-300 text-sm">
+                                        {{ data.site.contact.email or 'astheticfitnessclub2022@gmail.com' }}
+                                    </a>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3">
+                                    <i class="fab fa-whatsapp text-orange-500"></i>
+                                    <a href="{{ data.site.contact.whatsapp or '' }}" target="_blank" class="text-gray-300 hover:text-orange-500 transition-colors duration-300">
+                                        <span class="text-sm font-semibold">WhatsApp Us</span>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Social Media Links -->
+                            <div class="mt-6 pt-6 border-t border-gray-700">
+                                <p class="text-gray-400 mb-3 text-sm">Follow us on social media</p>
+                                <div class="flex space-x-3">
+                                    {% if data.site.social_links %}
+                                    {% for social in data.site.social_links %}
+                                    <a href="{{ social.url }}" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       class="w-10 h-10 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-colors duration-300 group">
+                                        <i class="{{ social.icon }} text-gray-400 group-hover:text-black"></i>
+                                    </a>
+                                    {% endfor %}
+                                    {% else %}
+                                    <!-- Default social links if none provided -->
+                                    <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-colors duration-300 group">
+                                        <i class="fab fa-facebook-f text-gray-400 group-hover:text-black"></i>
+                                    </a>
+                                    <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-colors duration-300 group">
+                                        <i class="fab fa-instagram text-gray-400 group-hover:text-black"></i>
+                                    </a>
+                                    <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-colors duration-300 group">
+                                        <i class="fab fa-youtube text-gray-400 group-hover:text-black"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Location Map -->
+                    <div class="bg-gray-800/50 border border-gray-700 rounded-2xl overflow-hidden">
+                        <div class="aspect-w-16 aspect-h-12 h-80">
+                            {% include '/components/location_map.html' %}
+                        </div>
+                        
+                        <!-- Address Overlay -->
+                        <div class="bg-gray-800/90 p-4">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-map-marker-alt text-orange-500"></i>
+                                <p class="text-white text-sm">{{ data.site.location_address or 'F-224, M.rahaman complex, Gazipur' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CTA -->
+                <div class="mt-12 text-center">
+                    <a href="{{ data.site.contact.whatsapp or '' }}" target="_blank" class="inline-block bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-8 py-4 rounded-full font-semibold text-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105">
+                        <i class="fab fa-whatsapp mr-2"></i>Message Us on WhatsApp
+                    </a>
+                    <p class="text-gray-400 mt-3 text-sm">We typically respond within minutes during business hours</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-16 bg-gradient-to-r from-orange-500 to-yellow-500" aria-label="Call to action">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold text-black mb-6 leading-tight">
+                        Ready to Start Your Fitness Journey?
+                    </h2>
+                    
+                    <p class="text-black/80 text-lg md:text-xl mb-8 max-w-2xl mx-auto leading-relaxed">
+                        Join today and take the first step towards a healthier, stronger you
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <a href="{{ data.site.contact.whatsapp or '' }}" target="_blank"
+                           class="bg-black hover:bg-gray-900 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105">
+                            Join Now
+                        </a>
+                        
+                        <a href="#" onclick="window.history.back();"
+                           class="border-2 border-black/20 hover:border-black text-black hover:bg-black/10 px-8 py-3 rounded-full font-semibold transition-all duration-300">
+                            Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+        
+    <!-- Footer -->
+    {% include '/components/footer.html' %}
+</body>
+</html>

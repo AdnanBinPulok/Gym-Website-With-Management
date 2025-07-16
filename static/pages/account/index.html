@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>My Account - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <meta name="description" content="Manage your {{ data.site.name or 'Aesthetic Fitness Gym' }} account, membership, and settings.">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s ease-in-out infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+    {% set active_sidebar = 'profile' %}
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-16 lg:pt-20">
+        <!-- Hero Section -->
+        <section class="relative py-6 md:py-12 lg:py-16 bg-black overflow-hidden" aria-label="Account dashboard">
+            <!-- Background -->
+            <div class="absolute inset-0">
+                <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+                <!-- Grid Pattern -->
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,107,53,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,107,53,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-3 sm:px-4 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-4 gap-4 lg:gap-8 max-w-7xl mx-auto">
+                    <!-- Content Container -->
+                    <div class="lg:col-span-4">
+                        <div class="grid lg:grid-cols-4 gap-4 lg:gap-8 h-full">
+                            <!-- Sidebar -->
+                            <div class="lg:col-span-1 flex order-1">
+                                <div class="w-full">
+                                    {% include '/components/account-sidebar.html' %}
+                                </div>
+                            </div>
+                            
+                            <!-- Main Content -->
+                            <div class="lg:col-span-3 space-y-4 lg:space-y-8 flex flex-col order-2">
+                                <!-- User Profile Header -->
+                                <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8">
+                                    <div class="flex flex-col lg:flex-row items-center lg:items-start gap-4 lg:gap-8">
+                                        <!-- Avatar -->
+                                        <div class="relative flex-shrink-0">
+                                            {% if data.user.avatar_url %}
+                                            <img src="{{ data.user.avatar_url }}" 
+                                                 alt="{{ data.user.full_name or data.user.username }}" 
+                                                 class="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full object-cover border-4 border-orange-500/20 shadow-2xl shadow-orange-500/25 cursor-pointer hover:scale-105 transition-all duration-300"
+                                                 onclick="openAvatarModal()">
+                                            {% else %}
+                                            <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-full flex items-center justify-center border-4 border-orange-500/20 shadow-2xl shadow-orange-500/25 cursor-pointer hover:scale-105 transition-all duration-300"
+                                                 onclick="openAvatarModal()">
+                                                <i class="fas fa-user text-black text-2xl sm:text-3xl lg:text-4xl"></i>
+                                            </div>
+                                            {% endif %}
+                                            <!-- Status Indicator -->
+                                            <div class="absolute -bottom-1 -right-1 w-6 h-6 lg:w-8 lg:h-8 {% if data.user.membership_active %}bg-green-500{% else %}bg-gray-500{% endif %} rounded-full border-2 lg:border-4 border-gray-900 flex items-center justify-center">
+                                                {% if data.user.membership_active %}
+                                                <i class="fas fa-check text-white text-xs lg:text-sm"></i>
+                                                {% else %}
+                                                <i class="fas fa-times text-white text-xs lg:text-sm"></i>
+                                                {% endif %}
+                                            </div>
+                                            <!-- Camera Icon Overlay -->
+                                            <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                                                 onclick="openAvatarModal()">
+                                                <i class="fas fa-camera text-white text-lg lg:text-2xl"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- User Info -->
+                                        <div class="flex-1 text-center lg:text-left">
+                                            <h1 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-2">{{ data.user.full_name or data.user.username }}</h1>
+                                            <p class="text-sm sm:text-lg lg:text-xl text-gray-400 mb-3 lg:mb-4">@{{ data.user.username }}</p>
+                                            
+                                            <!-- Badges -->
+                                            <div class="flex flex-wrap justify-center lg:justify-start gap-2 lg:gap-3 mb-4 lg:mb-6">
+                                                <!-- Membership Status -->
+                                                <div class="inline-flex items-center px-3 py-1 lg:px-4 lg:py-2 rounded-full text-xs lg:text-sm font-medium {% if data.user.membership_active %}bg-green-500/20 text-green-400 border border-green-500/30{% else %}bg-gray-500/20 text-gray-400 border border-gray-500/30{% endif %}">
+                                                    {% if data.user.membership_active %}
+                                                        <i class="fas fa-crown mr-1 lg:mr-2 text-xs lg:text-sm"></i>{{ data.user.membership_type.title() }} Member
+                                                    {% else %}
+                                                        <i class="fas fa-user mr-1 lg:mr-2 text-xs lg:text-sm"></i>{{ data.user.membership_type.title() }} Member
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <!-- Verification Status -->
+                                                {% if data.user.email_verified %}
+                                                <div class="inline-flex items-center px-3 py-1 lg:px-4 lg:py-2 rounded-full text-xs lg:text-sm font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                                    <i class="fas fa-check-circle mr-1 lg:mr-2 text-xs lg:text-sm"></i>Verified
+                                                </div>
+                                                {% else %}
+                                                <div class="inline-flex items-center px-3 py-1 lg:px-4 lg:py-2 rounded-full text-xs lg:text-sm font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                                                    <i class="fas fa-exclamation-triangle mr-1 lg:mr-2 text-xs lg:text-sm"></i>Unverified
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Financial Information -->
+                                            <div class="grid sm:grid-cols-2 gap-3 lg:gap-4">
+                                                <!-- Account Balance -->
+                                                <div class="bg-gray-800/50 rounded-xl lg:rounded-2xl p-3 lg:p-6">
+                                                    <div class="flex items-center space-x-2 lg:space-x-3">
+                                                        <div class="w-8 h-8 lg:w-12 lg:h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                                                            <i class="fas fa-wallet text-black text-sm lg:text-xl"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-gray-400 text-xs lg:text-sm">Account Balance</p>
+                                                            <p class="text-lg sm:text-xl lg:text-2xl font-black text-orange-500">{{ data.site.currency.symbol or '৳' }}{{ data.user.balance or '0.00' }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Membership Renewal -->
+                                                {% if data.user.membership_active and data.user.membership_renewal_price %}
+                                                <div class="bg-gray-800/50 rounded-xl lg:rounded-2xl p-3 lg:p-6">
+                                                    <div class="flex items-center space-x-2 lg:space-x-3">
+                                                        <div class="w-8 h-8 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                                                            <i class="fas fa-redo text-white text-sm lg:text-xl"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-gray-400 text-xs lg:text-sm">Next Renewal</p>
+                                                            <div class="text-lg sm:text-xl lg:text-2xl font-black text-blue-400">{{ data.site.currency.symbol or '৳' }}{{ data.user.membership_renewal_price or '0.00' }}</div>
+                                                            {% if data.user.membership_renewal_date %}
+                                                            <p class="text-xs text-gray-500">
+                                                                Due: {% if data.user.membership_renewal_date is string %}
+                                                                    {{ data.user.membership_renewal_date[:10] if data.user.membership_renewal_date|length >= 10 else 'N/A' }}
+                                                                {% else %}
+                                                                    {{ data.user.membership_renewal_date.strftime('%d %b %Y') }}
+                                                                {% endif %}
+                                                            </p>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Stats Overview -->
+                                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+                                    <!-- Membership Status -->
+                                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-xl lg:rounded-2xl p-3 lg:p-6 text-center hover:scale-105 transition-transform duration-300">
+                                        <div class="w-8 h-8 lg:w-12 lg:h-12 {% if data.user.membership_active %}bg-gradient-to-r from-green-500 to-green-400{% else %}bg-gradient-to-r from-gray-500 to-gray-400{% endif %} rounded-lg lg:rounded-xl flex items-center justify-center mx-auto mb-2 lg:mb-3">
+                                            <i class="fas fa-crown text-white text-sm lg:text-xl"></i>
+                                        </div>
+                                        <h3 class="text-sm lg:text-lg font-bold text-white mb-1">Membership</h3>
+                                        <p class="text-xs text-gray-400">
+                                            {% if data.user.membership_active %}Active{% else %}Inactive{% endif %}
+                                        </p>
+                                    </div>
+
+                                    <!-- Card ID -->
+                                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-xl lg:rounded-2xl p-3 lg:p-6 text-center hover:scale-105 transition-transform duration-300 relative overflow-hidden">
+                                        <!-- Card Background Pattern -->
+                                        <div class="absolute inset-0 opacity-5">
+                                            <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,107,53,0.5)_1px,transparent_1px),linear-gradient(-45deg,rgba(255,107,53,0.5)_1px,transparent_1px)] bg-[size:15px_15px]"></div>
+                                        </div>
+                                        
+                                        <div class="relative z-10">
+                                            <div class="w-8 h-8 lg:w-12 lg:h-12 {% if data.user.card_id %}bg-gradient-to-r from-orange-500 to-yellow-500{% else %}bg-gradient-to-r from-gray-500 to-gray-400{% endif %} rounded-lg lg:rounded-xl flex items-center justify-center mx-auto mb-2 lg:mb-3">
+                                                <i class="fas fa-id-card {% if data.user.card_id %}text-black{% else %}text-white{% endif %} text-sm lg:text-xl"></i>
+                                            </div>
+                                            <h3 class="text-sm lg:text-lg font-bold text-white mb-1">Card ID</h3>
+                                            {% if data.user.card_id %}
+                                            <p class="text-orange-500 font-mono text-xs lg:text-sm font-bold">{{ data.user.card_id }}</p>
+                                            {% else %}
+                                            <p class="text-gray-500 text-xs italic">Not Assigned</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Account Balance -->
+                                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-xl lg:rounded-2xl p-3 lg:p-6 text-center hover:scale-105 transition-transform duration-300">
+                                        <div class="w-8 h-8 lg:w-12 lg:h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto mb-2 lg:mb-3">
+                                            <i class="fas fa-wallet text-black text-sm lg:text-xl"></i>
+                                        </div>
+                                        <h3 class="text-sm lg:text-lg font-bold text-white mb-1">Balance</h3>
+                                        <p class="text-orange-500 font-bold text-xs lg:text-sm">{{ data.site.currency.symbol or '৳' }}{{ data.user.balance or '0.00' }}</p>
+                                    </div>
+
+                                    <!-- Member Since -->
+                                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-xl lg:rounded-2xl p-3 lg:p-6 text-center hover:scale-105 transition-transform duration-300">
+                                        <div class="w-8 h-8 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-500 to-blue-400 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto mb-2 lg:mb-3">
+                                            <i class="fas fa-calendar text-white text-sm lg:text-xl"></i>
+                                        </div>
+                                        <h3 class="text-sm lg:text-lg font-bold text-white mb-1">Member Since</h3>
+                                        <p class="text-xs text-gray-400">
+                                            {% if data.user.created_at %}
+                                                {% if data.user.created_at is string %}
+                                                    {{ data.user.created_at[:7] if data.user.created_at|length >= 7 else 'N/A' }}
+                                                {% else %}
+                                                    {{ data.user.created_at.strftime('%b %Y') }}
+                                                {% endif %}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Detailed Information Cards -->
+                                <div class="grid lg:grid-cols-2 gap-4 lg:gap-8 flex-1">
+                                    <!-- Membership Details -->
+                                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-xl lg:rounded-2xl p-4 lg:p-6">
+                                        <div class="flex items-center justify-between mb-4 lg:mb-6">
+                                            <h3 class="text-lg lg:text-xl font-bold text-white">Membership Details</h3>
+                                            <a href="/account/membership" class="text-orange-500 hover:text-orange-400 text-sm">Manage</a>
+                                        </div>
+                                        
+                                        <div class="space-y-3 lg:space-y-4">
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Plan Type</span>
+                                                <span class="text-white font-medium text-sm">{{ data.user.membership_type.title() }}</span>
+                                            </div>
+                                            
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Status</span>
+                                                <span class="{% if data.user.membership_active %}text-green-400{% else %}text-red-400{% endif %} font-medium text-sm">
+                                                    {% if data.user.membership_active %}Active{% else %}Inactive{% endif %}
+                                                </span>
+                                            </div>
+                                            
+                                            {% if data.user.membership_active and data.user.membership_end_date %}
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Expires</span>
+                                                <span class="text-white text-sm">
+                                                    {% if data.user.membership_end_date is string %}
+                                                        {{ data.user.membership_end_date[:10] if data.user.membership_end_date|length >= 10 else 'N/A' }}
+                                                    {% else %}
+                                                        {{ data.user.membership_end_date.strftime('%d %b %Y') }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if data.user.membership_payment_cycle %}
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Billing Cycle</span>
+                                                <span class="text-orange-400 font-medium text-sm">{{ data.user.membership_payment_cycle.title() }}</span>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if data.user.membership_renewal_date %}
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Next Renewal</span>
+                                                <span class="text-blue-400 text-sm">
+                                                    {% if data.user.membership_renewal_date is string %}
+                                                        {{ data.user.membership_renewal_date[:10] if data.user.membership_renewal_date|length >= 10 else 'N/A' }}
+                                                    {% else %}
+                                                        {{ data.user.membership_renewal_date.strftime('%d %b %Y') }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if data.user.membership_renewal_price %}
+                                            <div class="flex justify-between items-center py-2 lg:py-3">
+                                                <span class="text-gray-400 text-sm">Renewal Price</span>
+                                                <span class="text-blue-400 font-bold text-sm">{{ data.site.currency.symbol or '৳' }}{{ data.user.membership_renewal_price }}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        {% if not data.user.membership_active %}
+                                        <div class="mt-4 lg:mt-6 pt-4 lg:pt-6 border-t border-gray-700">
+                                            <a href="/pricing" 
+                                               class="block w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-4 lg:px-6 py-2 lg:py-3 rounded-xl font-bold text-center hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 text-sm lg:text-base">
+                                                <i class="fas fa-crown mr-2"></i>Upgrade Membership
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Account Information -->
+                                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-xl lg:rounded-2xl p-4 lg:p-6">
+                                        <div class="flex items-center justify-between mb-4 lg:mb-6">
+                                            <h3 class="text-lg lg:text-xl font-bold text-white">Account Information</h3>
+                                            <a href="/account/security" class="text-blue-500 hover:text-blue-400 text-sm">Edit</a>
+                                        </div>
+                                        
+                                        <div class="space-y-3 lg:space-y-4">
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Full Name</span>
+                                                <span class="text-white text-sm">{{ data.user.full_name or 'Not set' }}</span>
+                                            </div>
+                                            
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Username</span>
+                                                <span class="text-white text-sm">@{{ data.user.username }}</span>
+                                            </div>
+                                            
+                                            <!-- Card ID -->
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Card ID</span>
+                                                <div class="flex items-center space-x-2">
+                                                    {% if data.user.card_id %}
+                                                    <span class="text-orange-500 font-mono text-sm font-bold bg-orange-500/10 px-2 py-1 rounded-lg border border-orange-500/30">{{ data.user.card_id }}</span>
+                                                    <i class="fas fa-id-card text-orange-500 text-xs"></i>
+                                                    {% else %}
+                                                    <span class="text-gray-500 text-sm italic">Card not assigned</span>
+                                                    <i class="fas fa-exclamation-triangle text-yellow-500 text-xs"></i>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Email</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="text-white text-xs sm:text-sm">{{ data.user.email }}</span>
+                                                    {% if data.user.email_verified %}
+                                                        <i class="fas fa-check-circle text-green-400 text-xs"></i>
+                                                    {% else %}
+                                                        <i class="fas fa-exclamation-triangle text-yellow-400 text-xs"></i>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Phone</span>
+                                                <span class="text-white text-sm">{{ data.user.phone or 'Not set' }}</span>
+                                            </div>
+                                            
+                                            <div class="flex justify-between items-center py-2 lg:py-3 border-b border-gray-700/50">
+                                                <span class="text-gray-400 text-sm">Role</span>
+                                                <span class="text-orange-400 capitalize text-sm">{{ data.user.role }}</span>
+                                            </div>
+                                            
+                                            <div class="flex justify-between items-center py-2 lg:py-3">
+                                                <span class="text-gray-400 text-sm">Last Login</span>
+                                                <span class="text-white text-sm">
+                                                    {% if data.user.last_login %}
+                                                        {% if data.user.last_login is string %}
+                                                            {{ data.user.last_login[:10] if data.user.last_login|length >= 10 else 'N/A' }}
+                                                        {% else %}
+                                                            {{ data.user.last_login.strftime('%d %b %Y') }}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if not data.user.email_verified %}
+                                        <div class="mt-4 lg:mt-6 pt-4 lg:pt-6 border-t border-gray-700">
+                                            <button onclick="openVerifyModal()" 
+                                                    class="block w-full bg-yellow-500 text-black px-4 lg:px-6 py-2 lg:py-3 rounded-xl font-bold text-center hover:bg-yellow-400 transition-colors duration-300 text-sm lg:text-base">
+                                                <i class="fas fa-envelope mr-2"></i>Verify Email
+                                            </button>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+        
+    <!-- Footer -->
+    {% include '/components/footer.html' %}
+    
+    <!-- Email Verification Modal -->
+    <div id="verify-email-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white">Verify Email Address</h3>
+                <button onclick="closeVerifyModal()" class="text-gray-400 hover:text-gray-300 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Content -->
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-envelope text-white text-2xl"></i>
+                </div>
+                <p class="text-gray-300 text-center leading-relaxed">
+                    We'll send a verification link to <span class="text-orange-500 font-medium">{{ data.user.email }}</span>. 
+                    Please check your inbox and follow the instructions to verify your email address.
+                </p>
+            </div>
+            
+            <!-- Error Message -->
+            <div id="verify-error-message" class="hidden bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-exclamation-triangle text-red-400 mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <h4 class="text-red-400 font-semibold text-sm mb-1">Verification Failed</h4>
+                        <p class="text-red-300 text-xs sm:text-sm" id="verify-error-text"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div id="verify-success-message" class="hidden bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-6">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-400 mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <h4 class="text-green-400 font-semibold text-sm mb-1">Email Sent!</h4>
+                        <p class="text-green-300 text-xs sm:text-sm">Verification email has been sent successfully. Please check your inbox.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Actions -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="sendVerificationEmail()" 
+                        id="send-verify-btn"
+                        class="flex-1 bg-gradient-to-r from-yellow-500 to-yellow-400 text-black px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-yellow-500/25 transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-paper-plane mr-2"></i>Send Verification Email
+                </button>
+                <button onclick="closeVerifyModal()" 
+                        class="flex-1 border-2 border-gray-600 hover:border-gray-500 text-gray-300 hover:text-gray-200 px-6 py-3 rounded-xl font-bold transition-all duration-300">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avatar Upload Modal -->
+    <div id="avatar-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white">Change Avatar</h3>
+                <button onclick="closeAvatarModal()" class="text-gray-400 hover:text-gray-300 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Content -->
+            <div class="mb-6">
+                <div class="w-20 h-20 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-camera text-white text-2xl"></i>
+                </div>
+                <p class="text-gray-300 text-center leading-relaxed mb-4">
+                    Upload a new profile picture. File must be less than 5MB and in JPG, PNG, or GIF format.
+                </p>
+                
+                <!-- File Upload Area -->
+                <div class="border-2 border-dashed border-gray-600 hover:border-orange-500 rounded-xl p-6 text-center transition-colors duration-300 cursor-pointer"
+                     onclick="document.getElementById('avatar-input').click()"
+                     ondrop="handleDrop(event)"
+                     ondragover="handleDragOver(event)"
+                     ondragleave="handleDragLeave(event)">
+                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
+                    <p class="text-gray-400 mb-2">Click to upload or drag and drop</p>
+                    <p class="text-xs text-gray-500">JPG, PNG, GIF up to 5MB</p>
+                    <input type="file" 
+                           id="avatar-input" 
+                           accept="image/jpeg,image/png,image/gif" 
+                           class="hidden"
+                           onchange="handleFileSelect(event)">
+                </div>
+                
+                <!-- Selected File Preview -->
+                <div id="file-preview" class="hidden mt-4">
+                    <div class="bg-gray-800/50 rounded-xl p-4 flex items-center space-x-4">
+                        <img id="preview-image" class="w-16 h-16 rounded-lg object-cover" alt="Preview">
+                        <div class="flex-1">
+                            <p id="file-name" class="text-white font-medium text-sm overflow-hidden text-ellipsis whitespace-nowrap"></p>
+                            <p id="file-size" class="text-gray-400 text-xs"></p>
+                        </div>
+                        <button onclick="clearFileSelection()" class="text-red-400 hover:text-red-300 transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Message -->
+            <div id="avatar-error-message" class="hidden bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-exclamation-triangle text-red-400 mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <h4 class="text-red-400 font-semibold text-sm mb-1">Upload Failed</h4>
+                        <p class="text-red-300 text-xs sm:text-sm" id="avatar-error-text"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div id="avatar-success-message" class="hidden bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-6">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-400 mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <h4 class="text-green-400 font-semibold text-sm mb-1">Avatar Updated!</h4>
+                        <p class="text-green-300 text-xs sm:text-sm">Your profile picture has been updated successfully.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Actions -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="uploadAvatar()" 
+                        id="upload-avatar-btn"
+                        disabled
+                        class="flex-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                    <i class="fas fa-upload mr-2"></i>Upload Avatar
+                </button>
+                <button onclick="closeAvatarModal()" 
+                        class="flex-1 border-2 border-gray-600 hover:border-gray-500 text-gray-300 hover:text-gray-200 px-6 py-3 rounded-xl font-bold transition-all duration-300">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Email Verification Modal Functions
+        function openVerifyModal() {
+            document.getElementById('verify-email-modal').classList.remove('hidden');
+            hideVerifyError();
+            hideVerifySuccess();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verify-email-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function hideVerifyError() {
+            document.getElementById('verify-error-message').classList.add('hidden');
+        }
+        
+        function hideVerifySuccess() {
+            document.getElementById('verify-success-message').classList.add('hidden');
+        }
+        
+        function showVerifyError(message) {
+            const errorDiv = document.getElementById('verify-error-message');
+            const errorText = document.getElementById('verify-error-text');
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+            hideVerifySuccess();
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function showVerifySuccess() {
+            const successDiv = document.getElementById('verify-success-message');
+            successDiv.classList.remove('hidden');
+            hideVerifyError();
+            successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        async function sendVerificationEmail() {
+            hideVerifyError();
+            hideVerifySuccess();
+            
+            const submitBtn = document.getElementById('send-verify-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/verify-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    const errorMessage = data.message || data.error || 'Failed to Send Email';
+                    showVerifyError(errorMessage);
+                } else {
+                    showVerifySuccess();
+                    // Optionally close modal after a delay
+                    setTimeout(() => {
+                        closeVerifyModal();
+                    }, 3000);
+                }
+                
+            } catch (error) {
+                console.error('Verification email error:', error);
+                showVerifyError('Connection error. Please check your internet connection and try again.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('verify-email-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeVerifyModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeVerifyModal();
+            }
+        });
+
+        let selectedFile = null;
+
+        // Avatar Modal Functions
+        function openAvatarModal() {
+            document.getElementById('avatar-modal').classList.remove('hidden');
+            hideAvatarError();
+            hideAvatarSuccess();
+            clearFileSelection();
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeAvatarModal() {
+            document.getElementById('avatar-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            clearFileSelection();
+        }
+        
+        function hideAvatarError() {
+            document.getElementById('avatar-error-message').classList.add('hidden');
+        }
+        
+        function hideAvatarSuccess() {
+            document.getElementById('avatar-success-message').classList.add('hidden');
+        }
+        
+        function showAvatarError(message) {
+            const errorDiv = document.getElementById('avatar-error-message');
+            const errorText = document.getElementById('avatar-error-text');
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+            hideAvatarSuccess();
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function showAvatarSuccess() {
+            const successDiv = document.getElementById('avatar-success-message');
+            successDiv.classList.remove('hidden');
+            hideAvatarError();
+            successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // File handling functions
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                validateAndPreviewFile(file);
+            }
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const dropArea = event.currentTarget;
+            dropArea.classList.remove('border-orange-500');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                validateAndPreviewFile(files[0]);
+            }
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.classList.add('border-orange-500');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.classList.remove('border-orange-500');
+        }
+
+        function validateAndPreviewFile(file) {
+            hideAvatarError();
+            
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                showAvatarError('Please select a valid image file (JPG, PNG, or GIF).');
+                return;
+            }
+            
+            // Validate file size (5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                showAvatarError('File size must be less than 5MB.');
+                return;
+            }
+            
+            // Store selected file
+            selectedFile = file;
+            
+            // Preview the file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewDiv = document.getElementById('file-preview');
+                const previewImage = document.getElementById('preview-image');
+                const fileName = document.getElementById('file-name');
+                const fileSize = document.getElementById('file-size');
+                
+                previewImage.src = e.target.result;
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                
+                previewDiv.classList.remove('hidden');
+                document.getElementById('upload-avatar-btn').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearFileSelection() {
+            selectedFile = null;
+            document.getElementById('avatar-input').value = '';
+            document.getElementById('file-preview').classList.add('hidden');
+            document.getElementById('upload-avatar-btn').disabled = true;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function uploadAvatar() {
+            if (!selectedFile) {
+                showAvatarError('Please select a file to upload.');
+                return;
+            }
+
+            hideAvatarError();
+            hideAvatarSuccess();
+            
+            const submitBtn = document.getElementById('upload-avatar-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
+            submitBtn.disabled = true;
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', selectedFile);
+                
+                const response = await fetch('/api/change-avatar', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    const errorMessage = data.message || data.error || 'Failed to upload avatar';
+                    showAvatarError(errorMessage);
+                } else {
+                    showAvatarSuccess();
+                    
+                    // Update avatar image on page if new URL is provided
+                    if (data.avatar_url) {
+                        const avatarElements = document.querySelectorAll('img[alt*="' + ('{{ data.user.full_name or data.user.username }}').replace(/'/g, "\\'") + '"]');
+                        avatarElements.forEach(img => {
+                            img.src = data.avatar_url;
+                        });
+                    }
+                    
+                    // Close modal after success
+                    setTimeout(() => {
+                        closeAvatarModal();
+                        // Refresh page to show updated avatar
+                        window.location.reload();
+                    }, 2000);
+                }
+                
+            } catch (error) {
+                console.error('Avatar upload error:', error);
+                showAvatarError('Connection error. Please check your internet connection and try again.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                if (!document.getElementById('avatar-success-message').classList.contains('hidden')) {
+                    // Keep button disabled on success
+                    submitBtn.disabled = true;
+                } else {
+                    submitBtn.disabled = false;
+                }
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('avatar-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAvatarModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAvatarModal();
+            }
+        });
+
+        // Auto-refresh last login time
+        setInterval(() => {
+            const now = new Date();
+            const lastLogin = document.querySelector('[data-last-login]');
+            if (lastLogin) {
+                // Update relative time display if needed
+            }
+        }, 60000); // Update every minute
+    </script>
+</body>
+</html>

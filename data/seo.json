@@ -1,0 +1,145 @@
+{
+    "default_keywords": [
+        "fitness gym",
+        "fitness training",
+        "gym membership",
+        "fitness center",
+        "gym",
+        "personal training",
+        "strength training",
+        "bodybuilding",
+        "fitness classes",
+        "gym workouts",
+        "muscle building",
+        "fitness goals",
+        "health and fitness",
+        "workout programs",
+        "athletic training",
+        "fitness coaching"
+    ],
+    "pages": {
+        "home": {
+            "title": "Fitness Gym - Transform Your Body & Achieve Your Goals",
+            "tagline": "Your Gateway to Fitness Success",
+            "description": "Transform your physique at our fitness gym with professional training services. Build muscle, lose weight, and achieve your fitness goals. Start your fitness journey today!",
+            "keywords": [
+                "fitness gym",
+                "fitness training",
+                "gym membership",
+                "fitness center",
+                "gym",
+                "personal training",
+                "strength training",
+                "bodybuilding",
+                "fitness classes",
+                "gym workouts",
+                "muscle building",
+                "fitness goals",
+                "health and fitness",
+                "workout programs",
+                "athletic training",
+                "fitness coaching"
+            ]
+        },
+        "login": {
+            "title": "Login to Fitness Gym - Access Your Fitness Dashboard",
+            "tagline": "Access Your Fitness Dashboard",
+            "description": "Sign in to your fitness gym account to manage your workout plans, track progress, and access your fitness programs.",
+            "keywords": [
+                "fitness gym login",
+                "fitness dashboard",
+                "gym login",
+                "fitness gym account",
+                "account access",
+                "member portal",
+                "workout management",
+                "progress tracking",
+                "fitness tools"
+            ]
+        },
+        "signup": {
+            "title": "Join Fitness Gym - Start Your Fitness Journey Today",
+            "tagline": "Begin Your Fitness Journey",
+            "description": "Create your fitness gym membership and unlock powerful fitness training programs. Join members achieving their fitness goals!",
+            "keywords": [
+                "fitness gym signup",
+                "gym membership",
+                "join gym",
+                "fitness gym registration",
+                "fitness training programs",
+                "start training",
+                "fitness success",
+                "workout platform"
+            ]
+        },
+        "services": {
+            "title": "Fitness Services - Personal Training, Classes & Workout Programs",
+            "tagline": "Professional Training for Every Goal",
+            "description": "Professional fitness services for all levels. Personal training, group classes, and specialized programs at our gym. Memberships available.",
+            "keywords": [
+                "fitness services",
+                "personal training",
+                "fitness classes",
+                "gym services",
+                "fitness training",
+                "group fitness classes",
+                "workout programs",
+                "strength training",
+                "cardio classes",
+                "fitness coaching",
+                "training sessions",
+                "fitness programs",
+                "gym packages",
+                "affordable pricing",
+                "fitness promotion services"
+            ]
+        },
+        "contact": {
+            "title": "Contact Fitness Gym - Member Service",
+            "tagline": "We're Here to Help You Succeed",
+            "description": "Get support from our fitness experts at the gym. Live chat, email support, and phone assistance available for all your fitness questions.",
+            "keywords": [
+                "fitness gym support",
+                "fitness support",
+                "gym support",
+                "customer service",
+                "help",
+                "live chat support",
+                "contact us",
+                "technical support",
+                "billing help",
+                "social media experts"
+            ]
+        },
+        "policy": {
+            "title": "Privacy Policy & Terms - Fitness Gym Security & Trust",
+            "tagline": "Your Privacy is Our Priority",
+            "description": "Learn about our commitment to privacy, data protection, and secure fitness services. GDPR compliant and fully transparent.",
+            "keywords": [
+                "privacy policy",
+                "terms of service",
+                "data protection",
+                "GDPR compliant",
+                "secure services",
+                "legal information",
+                "member rights",
+                "transparency"
+            ]
+        },
+        "about": {
+            "title": "About Fitness Gym - Leading Fitness Training Center",
+            "tagline": "Empowering Fitness Success",
+            "description": "Our fitness gym has helped thousands of members achieve their fitness goals. Trusted by athletes, fitness enthusiasts, and health-conscious individuals.",
+            "keywords": [
+                "about fitness gym",
+                "gym information",
+                "fitness experts",
+                "training leaders",
+                "trusted gym",
+                "success stories",
+                "team",
+                "mission"
+            ]
+        }
+    }
+}

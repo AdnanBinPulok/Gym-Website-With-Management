@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Management - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <meta name="description" content="{{ data.site.meta_description or 'Aesthetic Fitness Gym is the best place to achieve your fitness goals!' }}">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Dark theme styles to match dashboard */
+        body {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+        
+        /* Mobile responsive improvements */
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.75rem !important;
+            }
+            
+            .gallery-item {
+                height: 120px;
+            }
+            
+            .gallery-item img,
+            .gallery-item video {
+                height: 120px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.5rem !important;
+            }
+            
+            .gallery-item {
+                height: 200px;
+            }
+            
+            .gallery-item img,
+            .gallery-item video {
+                height: 200px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% set active_page = 'gallery' %}
+    {% include 'components/dashboard-sidebar.html' %}
+    <div class="lg:ml-64 min-h-screen p-2 md:p-4 lg:p-6">
+        <div class="border border-slate-600 rounded-lg shadow-lg p-6 mb-2">
+            <h1 class="text-2xl font-bold">Gallery Management</h1>
+            <p class="text-gray-400">Manage gym photos and media content</p>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="border border-slate-600 p-4 rounded-lg bg-slate-800 mb-6">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-300">Total Media Items</h3>
+                    <p class="text-2xl font-bold text-blue-400" id="total-items"><i class="fas fa-spinner fa-spin"></i></p>
+                </div>
+                <div class="text-left sm:text-right">
+                    <p class="text-gray-400 text-sm">Limit: 30 items</p>
+                    <p class="text-gray-400 text-sm">Available: <span id="available-slots" class="text-green-400">--</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="gallery-container border border-slate-600 rounded-lg shadow-lg p-4 sm:p-6 mb-2">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold">Gallery Items</h2>
+                    <p class="text-gray-400 text-sm sm:text-base">Upload and manage your gym's photo gallery</p>
+                </div>
+                <button id="upload-btn" class="w-full sm:w-auto bg-blue-500 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-blue-400 transition-colors font-semibold shadow-lg" onclick="openUploadModal()">
+                    <i class="fas fa-upload mr-2"></i>Upload Image
+                </button>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-4xl text-blue-400"></i>
+                <p class="text-gray-400 mt-2">Loading gallery...</p>
+            </div>
+            
+            <!-- Gallery Grid -->
+            <div class="gallery-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4" id="gallery-grid" style="display: none;">
+                <!-- Gallery items will be populated by JavaScript -->
+            </div>
+            
+            <!-- No Items State -->
+            <div id="no-items-state" class="text-center py-8" style="display: none;">
+                <i class="fas fa-images text-4xl text-gray-500"></i>
+                <p class="text-gray-400 mt-2">No gallery items found</p>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition-colors mt-4" onclick="openUploadModal()">
+                    <i class="fas fa-upload mr-2"></i>Upload Your First Image
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden backdrop-blur-sm">
+        <div class="flex items-center justify-center min-h-screen p-2 sm:p-4">
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl max-w-md w-full mx-2 sm:mx-0 shadow-2xl border border-slate-700/50">
+                <div class="sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 p-4 sm:p-6 rounded-t-xl border-b border-slate-600/50">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center">
+                            <i class="fas fa-upload mr-2 sm:mr-3 text-blue-400"></i>
+                            Upload Image
+                        </h2>
+                        <button onclick="closeUploadModal()" class="text-gray-400 hover:text-white text-xl sm:text-2xl transition-colors duration-200 hover:bg-slate-600 p-1 sm:p-2 rounded-lg">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-4 sm:p-6">
+                    <form id="upload-form" enctype="multipart/form-data">
+                        <div class="mb-6">
+                            <label class="block text-gray-300 text-sm mb-2">
+                                Select Image File:
+                            </label>
+                            <input type="file" id="image-input" name="image" accept="image/*" required class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500">
+                        </div>
+                        
+                        <!-- Preview -->
+                        <div id="image-preview" class="mb-6 hidden">
+                            <label class="block text-gray-300 text-sm mb-2">Preview:</label>
+                            <img id="preview-img" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg border border-slate-600">
+                        </div>
+                        
+                        <!-- Info Box -->
+                        <div class="bg-blue-900/30 border border-blue-500/50 rounded-lg p-4 mb-6">
+                            <div class="flex items-center text-blue-400">
+                                <i class="fas fa-info-circle mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold">Upload Guidelines</h4>
+                                    <p class="text-sm text-blue-300">Only image files are supported. Maximum 30 items allowed in gallery.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button type="button" onclick="closeUploadModal()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" id="upload-submit-btn" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors">
+                                <i class="fas fa-upload mr-2"></i>Upload
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-2 sm:p-4">
+            <div class="bg-slate-800 rounded-lg max-w-md w-full mx-2 sm:mx-0">
+                <div class="p-4 sm:p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Delete Gallery Item</h2>
+                        <button onclick="closeDeleteModal()" class="text-gray-400 hover:text-white text-lg sm:text-xl">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Item Preview -->
+                    <div id="delete-item-preview" class="mb-6">
+                        <!-- Preview will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Warning -->
+                    <div class="bg-red-900/30 border border-red-600 rounded-lg p-4 mb-6">
+                        <div class="flex">
+                            <i class="fas fa-exclamation-triangle text-red-400 mr-3 mt-1"></i>
+                            <div>
+                                <h3 class="text-red-400 font-semibold mb-2">Warning!</h3>
+                                <p class="text-gray-300 text-sm">This action cannot be undone. The image will be permanently deleted from the gallery.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="closeDeleteModal()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                            Cancel
+                        </button>
+                        <button id="confirm-delete-btn" onclick="executeDelete()" class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    let galleryData = [];
+    let itemToDelete = null;
+    
+    // Fetch gallery items from API
+    async function fetchGallery() {
+        try {
+            showLoading();
+            
+            const response = await fetch('/api/get-gallery');
+            if (!response.ok) {
+                throw new Error('Failed to fetch gallery');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                galleryData = data.data || [];
+                renderGallery();
+                updateStats();
+            } else {
+                throw new Error(data.message || 'Failed to fetch gallery');
+            }
+            
+        } catch (error) {
+            console.error('Error fetching gallery:', error);
+            showError();
+        }
+    }
+    
+    // Update stats display
+    function updateStats() {
+        const totalItems = galleryData.length;
+        const availableSlots = Math.max(0, 30 - totalItems);
+        
+        document.getElementById('total-items').textContent = totalItems;
+        document.getElementById('available-slots').textContent = availableSlots;
+        
+        // Disable upload button if limit reached
+        const uploadBtn = document.getElementById('upload-btn');
+        if (availableSlots === 0) {
+            uploadBtn.disabled = true;
+            uploadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            uploadBtn.innerHTML = '<i class="fas fa-ban mr-2"></i>Gallery Full (30/30)';
+        } else {
+            uploadBtn.disabled = false;
+            uploadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            uploadBtn.innerHTML = '<i class="fas fa-upload mr-2"></i>Upload Image';
+        }
+    }
+    
+    // Render gallery items
+    function renderGallery() {
+        const galleryGrid = document.getElementById('gallery-grid');
+        const noItemsState = document.getElementById('no-items-state');
+        const loadingState = document.getElementById('loading-state');
+        
+        loadingState.style.display = 'none';
+        
+        if (galleryData.length === 0) {
+            galleryGrid.style.display = 'none';
+            noItemsState.style.display = 'block';
+            return;
+        }
+        
+        noItemsState.style.display = 'none';
+        galleryGrid.style.display = 'grid';
+        
+        galleryGrid.innerHTML = galleryData.map(item => createGalleryItem(item)).join('');
+    }
+    
+    // Create gallery item HTML
+    function createGalleryItem(item) {
+        const isVideo = item.type === 'video';
+        const mediaElement = isVideo 
+            ? `<video src="${item.url}" class="w-full h-32 sm:h-48 object-cover rounded-lg" muted></video>`
+            : `<img src="${item.url}" alt="Gallery Image" class="w-full h-32 sm:h-48 object-cover rounded-lg">`;
+        
+        const playIcon = isVideo ? '<i class="fas fa-play-circle text-lg sm:text-2xl text-white absolute top-2 left-2"></i>' : '';
+        
+        return `
+            <div class="gallery-item relative group cursor-pointer bg-slate-800 rounded-lg overflow-hidden border border-slate-600 hover:border-slate-500 transition-all duration-200">
+                ${mediaElement}
+                ${playIcon}
+                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div class="flex gap-1 sm:gap-2">
+                        <button onclick="viewItem('${item.url}', '${item.type}')" class="bg-blue-500 text-white p-1.5 sm:p-2 rounded-lg hover:bg-blue-400 transition-colors">
+                            <i class="fas fa-eye text-xs sm:text-sm"></i>
+                        </button>
+                        <button onclick="deleteItem('${item.url}', '${item.type}')" class="bg-red-500 text-white p-1.5 sm:p-2 rounded-lg hover:bg-red-400 transition-colors">
+                            <i class="fas fa-trash text-xs sm:text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="absolute bottom-1 sm:bottom-2 right-1 sm:right-2">
+                    <span class="bg-black bg-opacity-70 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+                        <i class="fas fa-${isVideo ? 'video' : 'image'} mr-1"></i>
+                        ${isVideo ? 'Video' : 'Image'}
+                    </span>
+                </div>
+            </div>
+        `;
+    }
+    
+    // View item in modal or new tab
+    function viewItem(url, type) {
+        if (type === 'video') {
+            // Open video in new tab
+            window.open(url, '_blank');
+        } else {
+            // Open image in new tab
+            window.open(url, '_blank');
+        }
+    }
+    
+    // Delete item
+    function deleteItem(url, type) {
+        itemToDelete = { url, type };
+        showDeleteModal(url, type);
+    }
+    
+    function showDeleteModal(url, type) {
+        const modal = document.getElementById('delete-modal');
+        const preview = document.getElementById('delete-item-preview');
+        
+        const isVideo = type === 'video';
+        const mediaElement = isVideo 
+            ? `<video src="${url}" class="w-full h-24 sm:h-32 object-cover rounded-lg" muted></video>`
+            : `<img src="${url}" alt="Gallery Image" class="w-full h-24 sm:h-32 object-cover rounded-lg">`;
+        
+        preview.innerHTML = `
+            <div class="text-center">
+                ${mediaElement}
+                <p class="text-gray-400 text-sm mt-2">
+                    <i class="fas fa-${isVideo ? 'video' : 'image'} mr-1"></i>
+                    ${isVideo ? 'Video' : 'Image'} item
+                </p>
+            </div>
+        `;
+        
+        modal.classList.remove('hidden');
+    }
+    
+    function closeDeleteModal() {
+        document.getElementById('delete-modal').classList.add('hidden');
+        itemToDelete = null;
+    }
+    
+    async function executeDelete() {
+        if (!itemToDelete) {
+            console.error('No item selected for deletion');
+            return;
+        }
+        
+        const confirmBtn = document.getElementById('confirm-delete-btn');
+        const originalText = confirmBtn.innerHTML;
+        
+        try {
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
+            
+            const response = await fetch('/api/delete-gallery-item', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    url: itemToDelete.url
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to delete item');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                closeDeleteModal();
+                showSuccessMessage('Gallery item deleted successfully!');
+                fetchGallery(); // Refresh gallery
+            } else {
+                throw new Error(data.message || 'Failed to delete item');
+            }
+            
+        } catch (error) {
+            console.error('Error deleting item:', error);
+            showErrorMessage('Failed to delete item. Please try again.');
+
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalText;
+        }
+    }
+    
+    // Upload functionality
+    function openUploadModal() {
+        const availableSlots = Math.max(0, 30 - galleryData.length);
+        if (availableSlots === 0) {
+            showErrorMessage('Gallery is full! Maximum 30 items allowed.');
+            return;
+        }
+        
+        document.getElementById('upload-modal').classList.remove('hidden');
+    }
+    
+    function closeUploadModal() {
+        document.getElementById('upload-modal').classList.add('hidden');
+        document.getElementById('upload-form').reset();
+        document.getElementById('image-preview').classList.add('hidden');
+    }
+    
+    // Image preview
+    document.getElementById('image-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-img').src = e.target.result;
+                document.getElementById('image-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('image-preview').classList.add('hidden');
+        }
+    });
+    
+    // Handle upload form submission
+    document.getElementById('upload-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const fileInput = document.getElementById('image-input');
+        const submitBtn = document.getElementById('upload-submit-btn');
+        const originalText = submitBtn.innerHTML;
+        
+        if (!fileInput.files[0]) {
+            showErrorMessage('Please select an image file.');
+            return;
+        }
+        
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
+            
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            
+            const response = await fetch('/api/upload-new-image-to-gallery', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                closeUploadModal();
+                showSuccessMessage('Image uploaded successfully!');
+                fetchGallery(); // Refresh gallery
+            } else {
+                throw new Error(data.message || 'Failed to upload image');
+            }
+            
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            showErrorMessage('Failed to upload image. Please try again.');
+            
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+    
+    // Utility functions
+    function showLoading() {
+        document.getElementById('loading-state').style.display = 'block';
+        document.getElementById('gallery-grid').style.display = 'none';
+        document.getElementById('no-items-state').style.display = 'none';
+    }
+    
+    function showError() {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('gallery-grid').style.display = 'none';
+        document.getElementById('no-items-state').style.display = 'block';
+        
+        document.getElementById('no-items-state').innerHTML = `
+            <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+            <p class="text-gray-400 mt-2">Error loading gallery. Please try again.</p>
+        `;
+    }
+    
+    // Success/Error messages
+    function showSuccessMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-2 sm:right-4 bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow-lg z-50 max-w-xs sm:max-w-sm text-sm sm:text-base';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    function showErrorMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-2 sm:right-4 bg-red-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow-lg z-50 max-w-xs sm:max-w-sm text-sm sm:text-base';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    // Close modals when clicking outside
+    document.getElementById('upload-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeUploadModal();
+        }
+    });
+    
+    document.getElementById('delete-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteModal();
+        }
+    });
+    
+    // Close modals with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const uploadModal = document.getElementById('upload-modal');
+            const deleteModal = document.getElementById('delete-modal');
+            
+            if (!uploadModal.classList.contains('hidden')) {
+                closeUploadModal();
+            } else if (!deleteModal.classList.contains('hidden')) {
+                closeDeleteModal();
+            }
+        }
+    });
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchGallery();
+    });
+</script>
+</body>
+</html>

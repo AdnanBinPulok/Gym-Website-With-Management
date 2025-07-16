@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments Management - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <meta name="description" content="{{ data.site.meta_description or 'Aesthetic Fitness Gym is the best place to achieve your fitness goals!' }}">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Dark theme styles to match dashboard */
+        body {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+    </style>
+</head>
+<body>
+    {% set active_page = 'payments' %}
+    {% include 'components/dashboard-sidebar.html' %}
+    <div class="lg:ml-64 min-h-screen p-2 md:p-4 lg:p-6">
+        <div class="border border-slate-600 rounded-lg shadow-lg p-6 mb-2">
+            <h1 class="text-2xl font-bold">Payment Management</h1>
+            <p class="text-gray-400">Track membership payments and transactions</p>
+        </div>
+
+        <div class="payment-container border border-slate-600 rounded-lg shadow-lg p-6 mb-2">
+            <h2 class="text-2xl font-bold">Payments List</h2>
+            <p class="text-gray-400 mb-6">View and manage all payment transactions</p>
+            
+            <!-- Search and Filter Controls -->
+            <div class="mb-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- User ID Filter -->
+                    <input type="number" id="user-id-filter" placeholder="Filter by User ID..." class="bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                    
+                    <!-- Transaction ID Filter -->
+                    <input type="text" id="transaction-id-filter" placeholder="Filter by Transaction ID..." class="bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                    
+                    <!-- Status Filter -->
+                    <select id="status-filter" class="bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                        <option value="">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                        <option value="canceled">canceled</option>
+                    </select>
+                    
+                    <!-- Payment Method Filter -->
+                    <select id="payment-method-filter" class="bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                        <option value="">All Methods</option>
+                        <option value="bkash">bKash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="rocket">Rocket</option>
+                        <option value="cash">Cash</option>
+                        <option value="bank">Bank Transfer</option>
+                        <option value="card">Card</option>
+                    </select>
+                    
+                    <!-- Order By -->
+                    <select id="order-by" class="bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                        <option value="created_at">Order by Created Date</option>
+                        <option value="updated_at">Order by Updated Date</option>
+                        <option value="amount">Order by Amount</option>
+                        <option value="status">Order by Status</option>
+                        <option value="payment_method">Order by Payment Method</option>
+                    </select>
+                    
+                    <!-- Order Direction -->
+                    <select id="order-direction" class="bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
+                </div>
+                
+                <!-- Clear Filters Button -->
+                <div class="flex justify-end">
+                    <button id="clear-filters-btn" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                        <i class="fas fa-times mr-2"></i>Clear All Filters
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-4xl text-blue-400"></i>
+                <p class="text-gray-400 mt-2">Loading payments...</p>
+            </div>
+            
+            <!-- Payments List -->
+            <div class="payments-list space-y-4" id="payments-list" style="display: none;">
+                <!-- Payments will be populated by JavaScript -->
+            </div>
+            
+            <!-- No Payments State -->
+            <div id="no-payments-state" class="text-center py-8" style="display: none;">
+                <i class="fas fa-credit-card text-4xl text-gray-500"></i>
+                <p class="text-gray-400 mt-2">No payments found</p>
+            </div>
+            
+            <div class="pagination flex justify-center items-center mt-6" id="pagination" style="display: none;">
+                <button class="prev-page bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50" disabled id="prev-page-btn">Previous</button>
+                <span class="page-info text-gray-300 mx-4">Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
+                <button class="next-page bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50" disabled id="next-page-btn">Next</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payment Detail Modal -->
+    <div id="payment-detail-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden backdrop-blur-sm">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-700/50">
+                <div class="sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 p-6 rounded-t-xl border-b border-slate-600/50">
+                    <!-- Modal Header -->
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <i class="fas fa-credit-card mr-3 text-green-400"></i>
+                            Payment Details
+                        </h2>
+                        <button onclick="closePaymentModal()" class="text-gray-400 hover:text-white text-2xl transition-colors duration-200 hover:bg-slate-600 p-2 rounded-lg">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Payment Detail Content -->
+                <div class="p-6" id="payment-detail-content">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Accept Payment Modal -->
+    <div id="accept-payment-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-slate-800 rounded-lg max-w-md w-full">
+                <div class="p-6">
+                    <!-- Modal Header -->
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-white">Accept Payment</h2>
+                        <button onclick="closeAcceptModal()" class="text-gray-400 hover:text-white text-xl">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Payment Info -->
+                    <div id="accept-payment-info" class="mb-6">
+                        <!-- Payment info will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Accept Payment Form -->
+                    <form id="accept-payment-form" class="space-y-4">
+                        <!-- Extension Months -->
+                        <div>
+                            <label class="block text-gray-300 text-sm mb-2">
+                                Extend Subscription (months):
+                            </label>
+                            <input type="number" id="extension-months" value="1" min="1" max="12" class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-green-500">
+                        </div>
+                        
+                        <!-- Balance to Add -->
+                        <div>
+                            <label class="block text-gray-300 text-sm mb-2">
+                                Add to Balance (optional):
+                            </label>
+                            <input type="number" id="balance-to-add" placeholder="Enter amount to add to user balance" min="0" step="0.01" class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-green-500">
+                        </div>
+                        
+                        <!-- Info Box -->
+                        <div class="bg-green-900/30 border border-green-500/50 rounded-lg p-4">
+                            <div class="flex items-center text-green-400">
+                                <i class="fas fa-info-circle mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold">Payment Acceptance</h4>
+                                    <p class="text-sm text-green-300">This will mark the payment as completed and extend the user's subscription.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3 pt-4">
+                            <button type="button" onclick="closeAcceptModal()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" id="confirm-accept-btn" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-colors">
+                                <i class="fas fa-check mr-2"></i>Accept Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reject Payment Modal -->
+    <div id="reject-payment-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-slate-800 rounded-lg max-w-md w-full">
+                <div class="p-6">
+                    <!-- Modal Header -->
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-white">Reject Payment</h2>
+                        <button onclick="closeRejectModal()" class="text-gray-400 hover:text-white text-xl">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Payment Info -->
+                    <div id="reject-payment-info" class="mb-6">
+                        <!-- Payment info will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Warning -->
+                    <div class="bg-red-900/30 border border-red-600 rounded-lg p-4 mb-6">
+                        <div class="flex">
+                            <i class="fas fa-exclamation-triangle text-red-400 mr-3 mt-1"></i>
+                            <div>
+                                <h3 class="text-red-400 font-semibold mb-2">Warning!</h3>
+                                <p class="text-gray-300 text-sm">This action will mark the payment as failed and cannot be undone. The user will need to make a new payment.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Rejection Reason (Optional) -->
+                    <div class="mb-6">
+                        <label class="block text-gray-300 text-sm mb-2">
+                            Reason for rejection (optional):
+                        </label>
+                        <textarea id="rejection-reason" placeholder="Enter reason for payment rejection..." rows="3" class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-red-500"></textarea>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeRejectModal()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                            Cancel
+                        </button>
+                        <button id="confirm-reject-btn" onclick="executeRejectPayment()" class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Reject Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    let currentPage = 1;
+    let totalPages = 1;
+    let paymentsData = [];
+    let statsData = {};
+    let paymentToAccept = null;
+    let paymentToReject = null;
+    
+    // Fetch payments from API
+    async function fetchPayments() {
+        try {
+            showLoading();
+            
+            const params = new URLSearchParams({
+                page: currentPage,
+                limit: 10,
+                order_by: document.getElementById('order-by').value || 'created_at',
+                order: document.getElementById('order-direction').value || 'desc'
+            });
+            
+            // Add filters if they have values
+            const userId = document.getElementById('user-id-filter').value.trim();
+            if (userId) params.append('user_id', userId);
+            
+            const transactionId = document.getElementById('transaction-id-filter').value.trim();
+            if (transactionId) params.append('transaction_id', transactionId);
+            
+            const status = document.getElementById('status-filter').value;
+            if (status) params.append('status', status);
+            
+            const paymentMethod = document.getElementById('payment-method-filter').value;
+            if (paymentMethod) params.append('payment_method', paymentMethod);
+            
+            const response = await fetch(`/api/get-all-payments?${params}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch payments');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                paymentsData = data.data || [];
+                totalPages = Math.ceil((data.total_count || 0) / 10);
+                renderPayments();
+                updatePagination();
+                calculateStats();
+            } else {
+                throw new Error(data.message || 'Failed to fetch payments');
+            }
+            
+        } catch (error) {
+            console.error('Error fetching payments:', error);
+            showError();
+        }
+    }
+    
+    // Calculate and display stats
+    function calculateStats() {
+        const totalRevenue = paymentsData
+            .filter(p => p.status === 'completed')
+            .reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+        
+        const completedCount = paymentsData.filter(p => p.status === 'completed').length;
+        const pendingCount = paymentsData.filter(p => p.status === 'pending').length;
+        const failedCount = paymentsData.filter(p => p.status === 'failed').length;
+        
+    }
+    
+    // Render payments in the UI
+    function renderPayments() {
+        const paymentsList = document.getElementById('payments-list');
+        const noPaymentsState = document.getElementById('no-payments-state');
+        const loadingState = document.getElementById('loading-state');
+        
+        loadingState.style.display = 'none';
+        
+        if (paymentsData.length === 0) {
+            paymentsList.style.display = 'none';
+            noPaymentsState.style.display = 'block';
+            document.getElementById('pagination').style.display = 'none';
+            return;
+        }
+        
+        noPaymentsState.style.display = 'none';
+        paymentsList.style.display = 'block';
+        document.getElementById('pagination').style.display = 'flex';
+        
+        paymentsList.innerHTML = paymentsData.map(payment => createPaymentCard(payment)).join('');
+    }
+    
+    // Create payment card HTML
+    function createPaymentCard(payment) {
+        const avatar = payment.user.avatar_url ? 
+            `<img src="${payment.user.avatar_url}" alt="${payment.user.full_name}" class="w-12 h-12 rounded-full object-cover">` :
+            `<div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="text-white font-semibold">${getInitials(payment.user.full_name)}</span>
+            </div>`;
+        
+        const statusColor = {
+            completed: 'bg-green-600',
+            pending: 'bg-yellow-600',
+            failed: 'bg-red-600',
+            canceled: 'bg-red-600'
+        };
+        
+        const statusIcon = {
+            completed: 'fas fa-check-circle',
+            pending: 'fas fa-clock',
+            failed: 'fas fa-times-circle',
+            canceled: 'fas fa-ban'
+        };
+        
+        const paymentMethodIcon = {
+            bkash: 'fas fa-mobile-alt',
+            nagad: 'fas fa-mobile-alt',
+            rocket: 'fas fa-mobile-alt',
+            cash: 'fas fa-money-bill',
+            bank: 'fas fa-university',
+            card: 'fas fa-credit-card'
+        };
+        
+        return `
+            <div class="payment-card border border-slate-600 rounded-lg p-6 bg-slate-800 hover:bg-slate-700/50 transition-colors">
+                <div class="flex flex-col lg:flex-row lg:items-center gap-6">
+                    <!-- User and Payment Info -->
+                    <div class="flex items-center space-x-4 flex-1">
+                        ${avatar}
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-white">#${payment.id} - (#${payment.user.id})${payment.user.full_name}</h3>
+                            <p class="text-gray-400 text-sm">@${payment.user.username}</p>
+                            <p class="text-gray-400 text-sm">${payment.user.email}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Details -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
+                        <div class="text-center">
+                            <p class="text-gray-400 text-sm">Amount</p>
+                            <p class="text-xl font-bold text-green-400">${payment.currency}${parseFloat(payment.amount).toLocaleString()}</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-400 text-sm">Method</p>
+                            <p class="text-white font-semibold">
+                                <i class="${paymentMethodIcon[payment.payment_method] || 'fas fa-question'} mr-1"></i>
+                                ${payment.payment_method.toUpperCase()}
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-400 text-sm">Status</p>
+                            <span class="${statusColor[payment.status]} text-white px-3 py-1 rounded-full text-sm font-medium">
+                                <i class="${statusIcon[payment.status]} mr-1"></i>
+                                ${payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                            </span>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-400 text-sm">Date</p>
+                            <p class="text-white font-semibold">${formatDate(payment.created_at)}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex gap-2">
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded text-sm hover:bg-blue-400 transition-colors" onclick="viewPayment('${payment.id}')">
+                            <i class="fas fa-eye mr-1"></i>View
+                        </button>
+                        ${payment.status === 'pending' ? `
+                            <button class="bg-green-500 text-white px-4 py-2 rounded text-sm hover:bg-green-400 transition-colors" onclick="approvePayment('${payment.id}')">
+                                <i class="fas fa-check mr-1"></i>Accept
+                            </button>
+                            <button class="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-400 transition-colors" onclick="rejectPayment('${payment.id}')">
+                                <i class="fas fa-times mr-1"></i>Reject
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                ${payment.note ? `
+                    <div class="mt-4 pt-4 border-t border-slate-600">
+                        <p class="text-gray-400 text-sm">Note:</p>
+                        <p class="text-white">${payment.note}</p>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+    
+    // View payment details
+    function viewPayment(paymentId) {
+        const payment = paymentsData.find(p => p.id == paymentId);
+        if (payment) {
+            showPaymentDetailModal(payment);
+        } else {
+            console.error('Payment not found:', paymentId);
+        }
+    }
+    
+    function showPaymentDetailModal(payment) {
+        const modal = document.getElementById('payment-detail-modal');
+        const content = document.getElementById('payment-detail-content');
+        
+        const avatar = payment.user.avatar_url ? 
+            `<img src="${payment.user.avatar_url}" alt="${payment.user.full_name}" class="w-16 h-16 rounded-full object-cover mx-auto">` :
+            `<div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto">
+                <span class="text-white font-semibold text-lg">${getInitials(payment.user.full_name)}</span>
+            </div>`;
+        
+        content.innerHTML = `
+            <div class="space-y-6">
+                <!-- Payment Header -->
+                <div class="text-center bg-gradient-to-r from-slate-700/50 to-slate-600/50 rounded-xl p-6 border border-slate-600/50">
+                    ${avatar}
+                    <h3 class="text-2xl font-bold text-white mt-4">${payment.user.full_name}</h3>
+                    <p class="text-gray-400">@${payment.user.username}</p>
+                    <p class="text-blue-400 mt-2">${payment.user.email}</p>
+                    <div class="mt-4">
+                        <span class="text-3xl font-bold text-green-400">${payment.currency}${parseFloat(payment.amount).toLocaleString()}</span>
+                    </div>
+                </div>
+                
+                <!-- Payment Details -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold text-white border-b border-slate-600 pb-2">
+                            <i class="fas fa-info-circle mr-2 text-blue-400"></i>Payment Information
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between py-2 border-b border-slate-600/30">
+                                <span class="text-gray-400">Payment ID:</span>
+                                <span class="text-white font-semibold">#${payment.id}</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-slate-600/30">
+                                <span class="text-gray-400">Transaction ID:</span>
+                                <span class="text-white font-semibold">${payment.transaction_id}</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-slate-600/30">
+                                <span class="text-gray-400">Amount:</span>
+                                <span class="text-green-400 font-bold text-lg">${payment.currency}${parseFloat(payment.amount).toLocaleString()}</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-slate-600/30">
+                                <span class="text-gray-400">Payment Method:</span>
+                                <span class="text-white font-semibold">${payment.payment_method.toUpperCase()}</span>
+                            </div>
+                            <div class="flex justify-between py-2">
+                                <span class="text-gray-400">Status:</span>
+                                <span class="bg-${payment.status === 'completed' ? 'green' : payment.status === 'pending' ? 'yellow' : 'red'}-600 text-white px-3 py-1 rounded-full text-sm">
+                                    ${payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold text-white border-b border-slate-600 pb-2">
+                            <i class="fas fa-clock mr-2 text-purple-400"></i>Timeline
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between py-2 border-b border-slate-600/30">
+                                <span class="text-gray-400">Created:</span>
+                                <span class="text-white font-semibold">${formatDateTime(payment.created_at)}</span>
+                            </div>
+                            ${payment.updated_at ? `
+                                <div class="flex justify-between py-2 border-b border-slate-600/30">
+                                    <span class="text-gray-400">Updated:</span>
+                                    <span class="text-white font-semibold">${formatDateTime(payment.updated_at)}</span>
+                                </div>
+                            ` : ''}
+                            ${payment.updated_by ? `
+                                <div class="flex justify-between py-2">
+                                    <span class="text-gray-400">Updated By:</span>
+                                    <span class="text-white font-semibold">${payment.updated_by}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                
+                ${payment.note ? `
+                    <div class="bg-slate-700/50 rounded-lg p-4">
+                        <h4 class="text-lg font-bold text-white mb-2">
+                            <i class="fas fa-sticky-note mr-2 text-yellow-400"></i>Note
+                        </h4>
+                        <p class="text-gray-300">${payment.note}</p>
+                    </div>
+                ` : ''}
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap gap-3 pt-4 border-t border-slate-600">
+                    ${payment.status === 'pending' ? `
+                        <button class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-400 transition-colors font-semibold" onclick="approvePayment('${payment.id}')">
+                            <i class="fas fa-check mr-2"></i>Accept Payment
+                        </button>
+                        <button class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-400 transition-colors font-semibold" onclick="rejectPayment('${payment.id}')">
+                            <i class="fas fa-times mr-2"></i>Reject Payment
+                        </button>
+                    ` : ''}
+                    <button class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-400 transition-colors font-semibold" onclick="generateReceipt('${payment.id}')">
+                        <i class="fas fa-receipt mr-2"></i>Generate Receipt
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        modal.classList.remove('hidden');
+    }
+    
+    // Payment actions
+    function approvePayment(paymentId) {
+        const payment = paymentsData.find(p => p.id == paymentId);
+        if (payment) {
+            paymentToAccept = payment;
+            showAcceptPaymentModal(payment);
+        } else {
+            console.error('Payment not found:', paymentId);
+        }
+    }
+    
+    function showAcceptPaymentModal(payment) {
+        const modal = document.getElementById('accept-payment-modal');
+        const paymentInfo = document.getElementById('accept-payment-info');
+        
+        const avatar = payment.user.avatar_url ? 
+            `<img src="${payment.user.avatar_url}" alt="${payment.user.full_name}" class="w-12 h-12 rounded-full object-cover">` :
+            `<div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                <span class="text-white font-semibold">${getInitials(payment.user.full_name)}</span>
+            </div>`;
+        
+        paymentInfo.innerHTML = `
+            <div class="flex items-center space-x-3 p-3 bg-slate-700 rounded-lg">
+                ${avatar}
+                <div class="flex-1">
+                    <h3 class="text-white font-semibold">${payment.user.full_name}</h3>
+                    <p class="text-gray-400 text-sm">@${payment.user.username}</p>
+                    <p class="text-green-400 font-bold">${payment.currency}${parseFloat(payment.amount).toLocaleString()}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-sm">Payment #${payment.id}</p>
+                    <p class="text-gray-400 text-sm">${payment.payment_method.toUpperCase()}</p>
+                </div>
+            </div>
+        `;
+        
+        // Reset form
+        document.getElementById('extension-months').value = '1';
+        document.getElementById('balance-to-add').value = '';
+        
+        modal.classList.remove('hidden');
+    }
+    
+    function closePaymentModal() {
+        document.getElementById('payment-detail-modal').classList.add('hidden');
+    }
+    
+    function closeAcceptModal() {
+        document.getElementById('accept-payment-modal').classList.add('hidden');
+        paymentToAccept = null;
+    }
+    
+    function closeRejectModal() {
+        document.getElementById('reject-payment-modal').classList.add('hidden');
+        paymentToReject = null;
+        document.getElementById('rejection-reason').value = '';
+    }
+    
+    // Handle accept payment form submission
+    document.getElementById('accept-payment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!paymentToAccept) {
+            console.error('No payment selected for acceptance');
+            return;
+        }
+        
+        const confirmBtn = document.getElementById('confirm-accept-btn');
+        const originalText = confirmBtn.innerHTML;
+        
+        try {
+            // Show loading state
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
+            const extensionMonths = parseInt(document.getElementById('extension-months').value) || 1;
+            const balanceToAdd = parseFloat(document.getElementById('balance-to-add').value) || null;
+            
+            const requestBody = {
+                payment_id: paymentToAccept.id,
+                extension_months: extensionMonths,
+                balance_to_add: balanceToAdd
+            };
+            
+            const response = await fetch('/api/accept-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to accept payment');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Success - close modal and refresh payments list
+                closeAcceptModal();
+                showSuccessMessage(`Payment accepted successfully! User's subscription extended by ${extensionMonths} month(s).`);
+                fetchPayments(); // Refresh the payments list
+            } else {
+                throw new Error(data.message || 'Failed to accept payment');
+            }
+            
+        } catch (error) {
+            console.error('Error accepting payment:', error);
+            showErrorMessage('Failed to accept payment. Please try again.');
+            
+            // Reset button state
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalText;
+        }
+    });
+    
+    // Reject payment function
+    function rejectPayment(paymentId) {
+        const payment = paymentsData.find(p => p.id == paymentId);
+        if (payment) {
+            paymentToReject = payment;
+            showRejectPaymentModal(payment);
+        } else {
+            console.error('Payment not found:', paymentId);
+        }
+    }
+    
+    function showRejectPaymentModal(payment) {
+        const modal = document.getElementById('reject-payment-modal');
+        const paymentInfo = document.getElementById('reject-payment-info');
+        
+        const avatar = payment.user.avatar_url ? 
+            `<img src="${payment.user.avatar_url}" alt="${payment.user.full_name}" class="w-12 h-12 rounded-full object-cover">` :
+            `<div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                <span class="text-white font-semibold">${getInitials(payment.user.full_name)}</span>
+            </div>`;
+        
+        paymentInfo.innerHTML = `
+            <div class="flex items-center space-x-3 p-3 bg-slate-700 rounded-lg">
+                ${avatar}
+                <div class="flex-1">
+                    <h3 class="text-white font-semibold">${payment.user.full_name}</h3>
+                    <p class="text-gray-400 text-sm">@${payment.user.username}</p>
+                    <p class="text-green-400 font-bold">${payment.currency}${parseFloat(payment.amount).toLocaleString()}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-400 text-sm">Payment #${payment.id}</p>
+                    <p class="text-gray-400 text-sm">${payment.payment_method.toUpperCase()}</p>
+                </div>
+            </div>
+        `;
+        
+        // Reset form
+        document.getElementById('rejection-reason').value = '';
+        
+        modal.classList.remove('hidden');
+    }
+    
+    async function executeRejectPayment() {
+        if (!paymentToReject) {
+            console.error('No payment selected for rejection');
+            return;
+        }
+        
+        const confirmBtn = document.getElementById('confirm-reject-btn');
+        const originalText = confirmBtn.innerHTML;
+        
+        try {
+            // Show loading state
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Rejecting...';
+            
+            const rejectionReason = document.getElementById('rejection-reason').value.trim();
+            
+            const requestBody = {
+                id: paymentToReject.id,
+                reason: rejectionReason || null
+            };
+            
+            const response = await fetch('/api/reject-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to reject payment');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Success - close modal and refresh payments list
+                closeRejectModal();
+                showSuccessMessage(`Payment #${data.id} has been rejected successfully.`);
+                fetchPayments(); // Refresh the payments list
+            } else {
+                throw new Error(data.message || 'Failed to reject payment');
+            }
+            
+        } catch (error) {
+            console.error('Error rejecting payment:', error);
+            showErrorMessage('Failed to reject payment. Please try again.');
+            
+            // Reset button state
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalText;
+        }
+    }
+    
+    // Utility functions
+    function getInitials(name) {
+        if (!name) return 'U';
+        return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString();
+    }
+    
+    function formatDateTime(dateString) {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleString();
+    }
+    
+    function showLoading() {
+        document.getElementById('loading-state').style.display = 'block';
+        document.getElementById('payments-list').style.display = 'none';
+        document.getElementById('no-payments-state').style.display = 'none';
+        document.getElementById('pagination').style.display = 'none';
+    }
+    
+    function showError() {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('payments-list').style.display = 'none';
+        document.getElementById('no-payments-state').style.display = 'block';
+        document.getElementById('pagination').style.display = 'none';
+        
+        document.getElementById('no-payments-state').innerHTML = `
+            <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+            <p class="text-gray-400 mt-2">Error loading payments. Please try again.</p>
+        `;
+    }
+    
+    // Pagination functions
+    function updatePagination() {
+        document.getElementById('current-page').textContent = currentPage;
+        document.getElementById('total-pages').textContent = totalPages;
+        
+        const prevBtn = document.getElementById('prev-page-btn');
+        const nextBtn = document.getElementById('next-page-btn');
+        
+        prevBtn.disabled = currentPage <= 1;
+        nextBtn.disabled = currentPage >= totalPages;
+    }
+    
+    function goToPage(page) {
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            fetchPayments();
+        }
+    }
+    
+    // Event listeners
+    document.getElementById('prev-page-btn').addEventListener('click', () => goToPage(currentPage - 1));
+    document.getElementById('next-page-btn').addEventListener('click', () => goToPage(currentPage + 1));
+    
+    // Filter event listeners
+    let searchTimeout;
+    
+    function addDebounceListener(elementId) {
+        document.getElementById(elementId).addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                fetchPayments();
+            }, 500);
+        });
+    }
+    
+    function addFilterListener(elementId) {
+        document.getElementById(elementId).addEventListener('change', () => {
+            currentPage = 1;
+            fetchPayments();
+        });
+    }
+    
+    addDebounceListener('user-id-filter');
+    addDebounceListener('transaction-id-filter');
+    addFilterListener('status-filter');
+    addFilterListener('payment-method-filter');
+    addFilterListener('order-by');
+    addFilterListener('order-direction');
+    
+    // Clear all filters
+    document.getElementById('clear-filters-btn').addEventListener('click', () => {
+        document.getElementById('user-id-filter').value = '';
+        document.getElementById('transaction-id-filter').value = '';
+        document.getElementById('status-filter').value = '';
+        document.getElementById('payment-method-filter').value = '';
+        document.getElementById('order-by').value = 'created_at';
+        document.getElementById('order-direction').value = 'desc';
+        
+        currentPage = 1;
+        fetchPayments();
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('accept-payment-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAcceptModal();
+        }
+    });
+    
+    document.getElementById('reject-payment-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeRejectModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const paymentModal = document.getElementById('payment-detail-modal');
+            const acceptModal = document.getElementById('accept-payment-modal');
+            const rejectModal = document.getElementById('reject-payment-modal');
+            
+            if (!rejectModal.classList.contains('hidden')) {
+                closeRejectModal();
+            } else if (!acceptModal.classList.contains('hidden')) {
+                closeAcceptModal();
+            } else if (!paymentModal.classList.contains('hidden')) {
+                closePaymentModal();
+            }
+        }
+    });
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchPayments();
+    });
+    
+    // Add utility functions for success/error messages
+    function showSuccessMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    function showErrorMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+</script>
+</body>
+</html>

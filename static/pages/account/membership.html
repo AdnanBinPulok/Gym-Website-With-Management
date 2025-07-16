@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>My Membership - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <meta name="description" content="Manage your membership and billing for {{ data.site.name or 'Aesthetic Fitness Gym' }}.">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+    {% set active_sidebar = 'membership' %}
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-16 lg:pt-20">
+        <section class="relative py-12 md:py-16 bg-black overflow-hidden">
+            <div class="absolute inset-0">
+                <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,107,53,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,107,53,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+                    <div class="lg:col-span-4">
+                        <div class="grid lg:grid-cols-4 gap-8 h-full">
+                            <!-- Sidebar -->
+                            <div class="lg:col-span-1 flex">
+                                <div class="w-full">
+                                    {% include '/components/account-sidebar.html' %}
+                                </div>
+                            </div>
+                            
+                            <!-- Main Content -->
+                            <div class="lg:col-span-3 space-y-8">
+                                <!-- Page Header -->
+                                <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-3xl p-8">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
+                                            <i class="fas fa-crown text-white text-2xl"></i>
+                                        </div>
+                                        <div>
+                                            <h1 class="text-3xl lg:text-4xl font-bold text-white mb-2">My Membership</h1>
+                                            <p class="text-gray-400">Manage your membership and billing</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-8">
+                                    <!-- Membership Status Card -->
+                                    <div class="space-y-6">                                        <!-- Status Badge -->
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                <div id="membership-status-indicator" class="w-4 h-4 bg-gray-500 rounded-full"></div>
+                                                <span id="membership-status-text" class="text-gray-400 font-semibold">Loading...</span>
+                                            </div>
+                                            <div id="membership-type-badge" class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white text-sm font-medium">
+                                                Loading...
+                                            </div>
+                                        </div>
+
+                                        <!-- Renewal Warning (Client-side rendered) -->
+                                        <div id="renewal-warning" class="hidden bg-yellow-900 border border-yellow-700 rounded-xl p-4">
+                                            <div class="flex items-center space-x-3">
+                                                <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
+                                                <div>
+                                                    <h3 class="text-yellow-300 font-semibold">Renewal Reminder</h3>
+                                                    <p class="text-yellow-200 text-sm mt-1" id="renewal-message">
+                                                        Your membership expires soon! Please renew to avoid service interruption.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Membership Details Grid -->
+                                        <div class="grid md:grid-cols-2 gap-6">
+                                            <!-- Left Column -->
+                                            <div class="space-y-4">
+                                                <div class="bg-gray-800 rounded-xl p-4">
+                                                    <div class="flex items-center space-x-3 mb-3">
+                                                        <i class="fas fa-calendar-alt text-blue-400"></i>                                                        <h3 class="text-white font-semibold">Membership Period</h3>
+                                                    </div>
+                                                    <div class="space-y-2 text-sm">                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-400">Start Date:</span>
+                                                            <span id="membership-start-date" class="text-white">Loading...</span>
+                                                        </div>
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-400">End Date:</span>
+                                                            <span id="membership-end-date" class="text-white">Loading...</span>
+                                                        </div>
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-400">Payment Cycle:</span>
+                                                            <span id="membership-payment-cycle" class="text-white capitalize">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="bg-gray-800 rounded-xl p-4">
+                                                    <div class="flex items-center space-x-3 mb-3">
+                                                        <i class="fas fa-id-card text-green-400"></i>
+                                                        <h3 class="text-white font-semibold">Member ID</h3>
+                                                    </div>                                                    
+                                                    <div class="text-2xl font-mono text-white bg-gray-700 rounded-lg p-2 text-center" id="member-id">
+                                                        Loading...
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Right Column -->
+                                            <div class="space-y-4">
+                                                <div class="bg-gray-800 rounded-xl p-4">
+                                                    <div class="flex items-center space-x-3 mb-3">
+                                                        <i class="fas fa-money-bill-wave text-yellow-400"></i>                                                        
+                                                        <h3 class="text-white font-semibold">Billing Information</h3>
+                                                    </div>
+                                                    <div class="space-y-2 text-sm">                                                        
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-400">Renewal Date:</span>
+                                                            <span id="membership-renewal-date" class="text-white">Loading...</span>
+                                                        </div>
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-400">Renewal Price:</span>
+                                                            <span id="membership-renewal-price" class="text-white">Loading...</span>
+                                                        </div>
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-400">Renewed By:</span>
+                                                            <span id="membership-renewal-by" class="text-white capitalize">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                </div>                                                <!-- Cancelled Section (Client-side rendered) -->
+                                                <div id="cancelled-section" class="hidden bg-red-900 border border-red-700 rounded-xl p-4">
+                                                    <div class="flex items-center space-x-3 mb-3">
+                                                        <i class="fas fa-exclamation-triangle text-red-400"></i>
+                                                        <h3 class="text-white font-semibold">Cancelled</h3>
+                                                    </div>
+                                                    <div class="space-y-2 text-sm">
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-400">Cancelled At:</span>
+                                                            <span id="membership-cancelled-at" class="text-white">N/A</span>
+                                                        </div>
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-400">Cancelled By:</span>
+                                                            <span id="membership-cancelled-by" class="text-white capitalize">N/A</span>
+                                                        </div>
+                                                        <div id="cancellation-reason-section" class="hidden mt-2">
+                                                            <span class="text-gray-400">Reason:</span>
+                                                            <p id="membership-cancelled-reason" class="text-white mt-1"></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>                                        <!-- Action Buttons -->
+                                        <div id="action-buttons" class="flex flex-wrap gap-4 pt-4 border-t border-gray-700">
+                                            <!-- Buttons will be rendered client-side -->
+                                            <div class="flex-1 bg-gray-700 text-white font-semibold py-3 px-6 rounded-xl text-center">
+                                                Loading...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+          <!-- Footer -->
+    {% include '/components/footer.html' %}    <script>
+        // Client-side membership data rendering
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMembershipData();
+        });
+
+        async function loadMembershipData() {
+            try {
+                const response = await fetch('/api/get-membership-state');
+                
+                if (!response.ok) {
+                    console.error('Failed to fetch membership state');
+                    showError();
+                    return;
+                }
+
+                const result = await response.json();
+                
+                if (!result.success || !result.data) {
+                    console.error('Invalid response format');
+                    showError();
+                    return;
+                }
+
+                const membershipData = result.data;
+                renderMembershipData(membershipData);
+                checkRenewalWarning(membershipData);
+                
+            } catch (error) {
+                console.error('Error fetching membership state:', error);
+                showError();
+            }
+        }
+
+        function renderMembershipData(data) {
+            // Update status badge
+            const statusIndicator = document.getElementById('membership-status-indicator');
+            const statusText = document.getElementById('membership-status-text');
+            const typeBadge = document.getElementById('membership-type-badge');
+
+            if (data.membership_active) {
+                statusIndicator.className = 'w-4 h-4 bg-green-500 rounded-full animate-pulse';
+                statusText.textContent = 'Active Membership';
+                statusText.className = 'text-green-400 font-semibold';
+            } else {
+                statusIndicator.className = 'w-4 h-4 bg-red-500 rounded-full';
+                statusText.textContent = 'Inactive Membership';
+                statusText.className = 'text-red-400 font-semibold';
+            }
+
+            typeBadge.textContent = data.membership_type || 'No Plan';
+
+            // Update membership details
+            document.getElementById('membership-start-date').textContent = formatDate(data.membership_start_date) || 'N/A';
+            document.getElementById('membership-end-date').textContent = formatDate(data.membership_end_date) || 'N/A';
+            document.getElementById('membership-payment-cycle').textContent = data.membership_payment_cycle || 'N/A';
+            document.getElementById('member-id').textContent = data.card_id || 'Not Assigned';
+
+            // Update billing information
+            document.getElementById('membership-renewal-date').textContent = formatDate(data.membership_renewal_date) || 'N/A';
+            document.getElementById('membership-renewal-price').textContent = data.membership_renewal_price ? `৳${data.membership_renewal_price}` : 'N/A';
+            document.getElementById('membership-renewal-by').textContent = data.membership_renewal_by || 'N/A';
+
+            // Handle cancelled section
+            if (data.membership_cancelled) {
+                const cancelledSection = document.getElementById('cancelled-section');
+                cancelledSection.classList.remove('hidden');
+                
+                document.getElementById('membership-cancelled-at').textContent = formatDate(data.membership_cancelled_at) || 'N/A';
+                document.getElementById('membership-cancelled-by').textContent = data.membership_cancelled_by || 'N/A';
+                
+                if (data.membership_cancelled_reason) {
+                    document.getElementById('cancellation-reason-section').classList.remove('hidden');
+                    document.getElementById('membership-cancelled-reason').textContent = data.membership_cancelled_reason;
+                }
+            }
+
+            // Render action buttons
+            renderActionButtons(data);
+        }        function renderActionButtons(data) {
+            const actionButtons = document.getElementById('action-buttons');
+            
+            if (data.membership_active && !data.membership_cancelled) {
+                actionButtons.innerHTML = `
+                    <a href="/pay-now" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 text-center inline-block">
+                        <i class="fas fa-credit-card mr-2"></i>
+                        Renew Membership
+                    </a>
+                    <a href="https://wa.me/+8801737966939" target="_blank" class="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 text-center inline-block">
+                        <i class="fas fa-arrow-up mr-2"></i>
+                        Upgrade Plan
+                    </a>
+                `;
+            } else {
+                actionButtons.innerHTML = `
+                    <button class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-play mr-2"></i>
+                        Activate Membership
+                    </button>
+                `;
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return null;
+            
+            const date = new Date(dateString);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        function checkRenewalWarning(membershipData) {
+            // Check if membership is active and has renewal date
+            if (membershipData.membership_active && membershipData.membership_renewal_date) {
+                const renewalDate = new Date(membershipData.membership_renewal_date);
+                const currentDate = new Date();
+                
+                // Calculate difference in days
+                const timeDiff = renewalDate.getTime() - currentDate.getTime();
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                // Show warning if renewal is within 5 days and not expired
+                if (daysDiff <= 5 && daysDiff >= 0) {
+                    showRenewalWarning(daysDiff);
+                }
+            }
+        }
+
+        function showRenewalWarning(daysLeft) {
+            const warningElement = document.getElementById('renewal-warning');
+            const messageElement = document.getElementById('renewal-message');
+            
+            if (warningElement && messageElement) {
+                const dayText = daysLeft === 1 ? 'day' : 'days';
+                const urgencyClass = daysLeft <= 2 ? 'bg-red-900 border-red-700' : 'bg-yellow-900 border-yellow-700';
+                const textColor = daysLeft <= 2 ? 'text-red-300' : 'text-yellow-300';
+                const messageColor = daysLeft <= 2 ? 'text-red-200' : 'text-yellow-200';
+                
+                // Update styling based on urgency
+                warningElement.className = `${urgencyClass} border rounded-xl p-4`;
+                warningElement.querySelector('h3').className = `${textColor} font-semibold`;
+                messageElement.className = `${messageColor} text-sm mt-1`;
+                
+                // Update message
+                if (daysLeft === 0) {
+                    messageElement.textContent = `Your membership expires today! Please renew immediately to avoid service interruption.`;
+                } else {
+                    messageElement.textContent = `Your membership expires in ${daysLeft} ${dayText}! Please renew to avoid service interruption.`;
+                }
+                
+                // Show the warning
+                warningElement.classList.remove('hidden');
+            }
+        }
+
+        function showError() {
+            // Show error state
+            document.getElementById('membership-status-text').textContent = 'Error loading data';
+            document.getElementById('membership-type-badge').textContent = 'Error';
+            
+            const actionButtons = document.getElementById('action-buttons');
+            actionButtons.innerHTML = `
+                <button onclick="loadMembershipData()" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300">
+                    <i class="fas fa-refresh mr-2"></i>
+                    Retry
+                </button>
+            `;
+        }
+    </script>
+</body>
+</html>

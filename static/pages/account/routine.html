@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>My Workout Routine - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <meta name="description" content="View and download your personalized workout routine from {{ data.site.name or 'Aesthetic Fitness Gym' }}.">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-black text-white overflow-x-hidden min-h-screen">
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-16 lg:pt-20">
+        <!-- Back Button and Page Header -->
+        <div class="bg-gray-900/50 border-b border-gray-700 py-4 md:py-6">
+            <div class="container mx-auto max-w-6xl px-3 md:px-4 lg:px-6">
+                <div class="flex items-center justify-between">
+                    <!-- Back Button -->
+                    <a href="/account" 
+                       class="flex items-center space-x-2 text-gray-300 hover:text-orange-500 transition-colors duration-300 group">
+                        <div class="w-8 h-8 lg:w-10 lg:h-10 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                            <i class="fas fa-arrow-left text-white group-hover:text-black text-sm lg:text-base"></i>
+                        </div>
+                        <span class="font-medium text-sm lg:text-base">Back to Account</span>
+                    </a>
+                    
+                    
+                    <!-- Download Button -->
+                    {% if data.user.routine %}
+                    <button onclick="downloadRoutineAsPDF()" 
+                            class="flex items-center space-x-1 lg:space-x-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-3 py-1.5 md:px-4 md:py-2 lg:px-6 lg:py-3 rounded-full font-bold hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 text-sm lg:text-base">
+                        <i class="fas fa-download text-sm lg:text-base"></i>
+                        <span class="hidden md:inline">Download PDF</span>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="container mx-auto max-w-6xl px-3 md:px-4 lg:px-6 py-4 md:py-6 lg:py-8">
+            {% if data.user.routine %}
+            <!-- Routine Content -->
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-4 md:p-6 lg:p-8 xl:p-12 shadow-2xl">
+                <!-- Routine Header -->
+                <div class="text-center mb-6 md:mb-8 lg:mb-12">
+                    <div class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 lg:mb-6">
+                        <i class="fas fa-dumbbell text-white text-2xl lg:text-3xl"></i>
+                    </div>
+                    <h2 class="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-3 lg:mb-4">Personal Training Routine</h2>
+                    <div class="flex flex-wrap justify-center gap-2 lg:gap-4 text-sm">
+                        <div class="flex items-center space-x-1 lg:space-x-2 bg-gray-800/50 px-2 py-1 lg:px-4 lg:py-2 rounded-full border border-gray-600">
+                            <i class="fas fa-user text-orange-500 text-sm"></i>
+                            <span class="text-gray-300 text-xs lg:text-sm">{{ data.user.full_name or data.user.username }}</span>
+                        </div>
+                        <div class="flex items-center space-x-1 lg:space-x-2 bg-gray-800/50 px-2 py-1 lg:px-4 lg:py-2 rounded-full border border-gray-600">
+                            <i class="fas fa-calendar text-orange-500 text-sm"></i>
+                            <span class="text-gray-300 text-xs lg:text-sm">
+                                {% if data.user.routine_created_at %}
+                                    {{ data.user.routine_created_at[:10] if data.user.routine_created_at is string else data.user.routine_created_at.strftime('%d %b %Y') }}
+                                {% else %}
+                                    Recent
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="flex items-center space-x-1 lg:space-x-2 bg-gray-800/50 px-2 py-1 lg:px-4 lg:py-2 rounded-full border border-gray-600">
+                            <i class="fas fa-user-tie text-orange-500 text-sm"></i>
+                            <span class="text-gray-300 text-xs lg:text-sm">{{ data.user.trainer_name or 'Professional Trainer' }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Routine Content Display -->
+                <div id="routine-content" class="bg-gray-800/30 border border-gray-700/50 rounded-xl p-4 md:p-6 lg:p-8 xl:p-12 min-h-64 lg:min-h-96">
+                    <div class="prose prose-invert prose-lg max-w-none">
+                        <div class="text-gray-300 leading-relaxed whitespace-pre-line text-sm md:text-base lg:text-lg font-mono">{{ data.user.routine }}</div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="mt-6 md:mt-8 lg:mt-12 flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
+                    <button onclick="downloadRoutineAsPDF()" 
+                            class="flex items-center justify-center space-x-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-6 py-3 lg:px-8 lg:py-4 rounded-xl font-bold hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 text-sm lg:text-base">
+                        <i class="fas fa-file-pdf text-base lg:text-lg"></i>
+                        <span>Download as PDF</span>
+                    </button>
+                    
+                    <button onclick="printRoutine()" 
+                            class="flex items-center justify-center space-x-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 lg:px-8 lg:py-4 rounded-xl font-bold transition-all duration-300 text-sm lg:text-base">
+                        <i class="fas fa-print text-base lg:text-lg"></i>
+                        <span>Print Routine</span>
+                    </button>
+                    
+                    <button onclick="copyRoutineText()" 
+                            class="flex items-center justify-center space-x-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 lg:px-8 lg:py-4 rounded-xl font-bold transition-all duration-300 text-sm lg:text-base">
+                        <i class="fas fa-copy text-base lg:text-lg"></i>
+                        <span>Copy Text</span>
+                    </button>
+                </div>
+            </div>
+            
+            {% else %}
+            <!-- No Routine Available -->
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 md:p-8 lg:p-12 xl:p-16 text-center min-h-64 lg:min-h-96 flex flex-col justify-center">
+                <div class="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 lg:mb-8">
+                    <i class="fas fa-clipboard-list text-white text-3xl lg:text-4xl"></i>
+                </div>
+                <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 lg:mb-6">No Routine Available</h2>
+                <p class="text-gray-400 text-base lg:text-lg mb-8 lg:mb-12 max-w-2xl mx-auto leading-relaxed">
+                    You don't have a personalized workout routine yet. Contact our trainers to get a custom plan designed specifically for your fitness goals and preferences.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center">
+                    <a href="/contact" 
+                       class="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-3 lg:px-10 lg:py-4 rounded-xl font-bold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 text-sm lg:text-base">
+                        <i class="fas fa-user-tie mr-2 lg:mr-3"></i>Contact Trainer
+                    </a>
+                    <a href="/pricing" 
+                       class="border-2 border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white px-8 py-3 lg:px-10 lg:py-4 rounded-xl font-bold transition-all duration-300 text-sm lg:text-base">
+                        <i class="fas fa-crown mr-2 lg:mr-3"></i>View Plans
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+        
+    <!-- Footer -->
+    {% include '/components/footer.html' %}
+    
+    <script>
+        // Download routine as PDF
+        function downloadRoutineAsPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // PDF content
+            const title = "{{ data.site.name or 'Aesthetic Fitness Gym' }}";
+            const userName = "{{ data.user.full_name or data.user.username }}";
+            const routineText = `{{ data.user.routine|replace('\n', '\\n')|replace('\r', '')|replace('"', '\\"') }}`;
+            const currentDate = new Date().toLocaleDateString();
+            
+            // Simple header
+            doc.setFontSize(20);
+            doc.setTextColor(0, 0, 0);
+            doc.text(title, 20, 30);
+            
+            doc.setFontSize(16);
+            doc.text("Workout Routine", 20, 45);
+            
+            // Basic info
+            doc.setFontSize(12);
+            doc.text(`Member: ${userName}`, 20, 65);
+            doc.text(`Date: ${currentDate}`, 20, 75);
+            
+            // Simple line
+            doc.line(20, 85, 190, 85);
+            
+            // Routine content
+            doc.setFontSize(11);
+            const lines = doc.splitTextToSize(routineText, 170);
+            let yPosition = 100;
+            
+            lines.forEach(line => {
+                if (yPosition > 270) {
+                    doc.addPage();
+                    yPosition = 30;
+                }
+                doc.text(line, 20, yPosition);
+                yPosition += 6;
+            });
+            
+            // Simple footer
+            if (yPosition > 250) {
+                doc.addPage();
+                yPosition = 30;
+            }
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(title, 20, yPosition + 20);
+            
+            // Save with simple filename
+            const fileName = `routine-${userName.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+            doc.save(fileName);
+        }
+        
+        // Print routine
+        function printRoutine() {
+            const routineText = `{{ data.user.routine|replace('\n', '\\n')|replace('\r', '')|replace('"', '\\"') }}`;
+            const userName = "{{ data.user.full_name or data.user.username }}";
+            const printWindow = window.open('', '_blank');
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Workout Routine - ${userName}</title>
+                    <style>
+                        @media print {
+                            body { margin: 0; }
+                            .no-print { display: none; }
+                        }
+                        body { 
+                            font-family: 'Arial', sans-serif; 
+                            margin: 40px; 
+                            line-height: 1.8; 
+                            color: #333;
+                            font-size: 14px;
+                        }
+                        .header { 
+                            text-align: center; 
+                            margin-bottom: 40px; 
+                            border-bottom: 3px solid #ff6b35; 
+                            padding-bottom: 30px;
+                        }
+                        .title { 
+                            color: #ff6b35; 
+                            font-size: 28px; 
+                            font-weight: bold; 
+                            margin-bottom: 10px;
+                        }
+                        .subtitle { 
+                            font-size: 20px; 
+                            margin-bottom: 10px;
+                            color: #555;
+                        }
+                        .member-info { 
+                            font-size: 16px; 
+                            color: #666;
+                            margin-top: 15px;
+                        }
+                        .routine-content { 
+                            white-space: pre-line; 
+                            margin: 30px 0;
+                            font-family: 'Courier New', monospace;
+                            font-size: 13px;
+                            line-height: 1.8;
+                            background: #f9f9f9;
+                            padding: 30px;
+                            border-radius: 8px;
+                            border: 1px solid #ddd;
+                        }
+                        .footer { 
+                            margin-top: 50px; 
+                            padding-top: 30px; 
+                            border-top: 2px solid #ddd; 
+                            text-align: center; 
+                            font-size: 12px; 
+                            color: #888;
+                        }
+                        .footer p { margin: 5px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="title">{{ data.site.name or 'Aesthetic Fitness Gym' }}</div>
+                        <div class="subtitle">Personal Workout Routine</div>
+                        <div class="member-info">
+                            <strong>Member:</strong> ${userName}<br>
+                            <strong>Trainer:</strong> {{ data.user.trainer_name or 'Professional Trainer' }}<br>
+                            <strong>Generated:</strong> ${new Date().toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div class="routine-content">${routineText}</div>
+                    <div class="footer">
+                        <p><strong>{{ data.site.name or 'Aesthetic Fitness Gym' }}</strong></p>
+                        <p>Follow this routine consistently for best results</p>
+                        <p>Contact us: {{ data.site.contact.phone or '+880 167 044 2072' }}</p>
+                        <p>{{ data.site.location_address or 'F-224, M.rahaman complex, Gazipur' }}</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        }
+        
+        // Copy routine text to clipboard
+        function copyRoutineText() {
+            const routineText = `{{ data.user.routine|replace('\n', '\\n')|replace('\r', '')|replace('"', '\\"') }}`;
+            
+            navigator.clipboard.writeText(routineText).then(() => {
+                // Show success message
+                const button = event.target.closest('button');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check text-lg"></i><span>Copied!</span>';
+                button.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+                button.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('bg-green-600');
+                    button.classList.add('bg-gray-700', 'hover:bg-gray-600');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = routineText;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const button = event.target.closest('button');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check text-lg"></i><span>Copied!</span>';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                }, 2000);
+            });
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + P for print
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                {% if data.user.routine %}
+                printRoutine();
+                {% endif %}
+            }
+            
+            // Ctrl/Cmd + S for download
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                {% if data.user.routine %}
+                downloadRoutineAsPDF();
+                {% endif %}
+            }
+            
+            // Ctrl/Cmd + C for copy (when not selecting text)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && window.getSelection().toString() === '') {
+                e.preventDefault();
+                {% if data.user.routine %}
+                copyRoutineText();
+                {% endif %}
+            }
+        });
+    </script>
+</body>
+</html>

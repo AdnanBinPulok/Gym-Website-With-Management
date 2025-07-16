@@ -1,0 +1,38 @@
+{
+    "name": "Example Gym",
+    "version": "1.0.0",
+    "domain": "example.com",
+    "favicon": "/images/favicon.png",
+    "tagline": "Your Fitness Journey Starts Here",
+    "meta_description": "Example Gym is the best place to achieve your fitness goals!",
+    "description": "Example Gym provides comprehensive fitness services and training programs. We offer personalized workout plans, nutrition guidance, and professional fitness coaching to help you achieve your health goals.",
+    "bn_description": "এটি একটি উদাহরণ ফিটনেস জিম কনফিগ।",
+    
+    "home_hero_bg_image": "https://example.com/images/hero-bg.png",
+    "home_hero_bg_image_mobile": "https://example.com/images/hero-bg-mobile.png",
+    
+    "logo": "/images/logo.png",
+    "contact": {
+        "email": "contact@example.com",
+        "phone": "+10000000000",
+        "whatsapp": "https://wa.me/+10000000000"
+    },
+    "social_links": [
+        {
+            "name": "Facebook",
+            "url": "https://facebook.com/example",
+            "icon": "fab fa-facebook-f"
+        }
+    ],
+    "currency": {
+        "name": "USD",
+        "symbol": "$"
+    },
+    "superadmin": {
+        "email": "admin@example.com",
+        "password": "admin123"
+    },
+    "timezone": "UTC",
+    "location_link": "https://maps.example.com/location",
+    "location_address": "123 Example Street, Example City"
+}

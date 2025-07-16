@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>Contact Us - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <meta name="description" content="Get in touch with {{ data.site.name or 'Aesthetic Fitness Gym' }}. Visit us, call us, or send us a message to start your fitness journey.">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s ease-in-out infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-16 lg:pt-20">
+        <!-- Hero Section -->
+        <section class="relative py-12 md:py-20 lg:py-32 bg-black overflow-hidden" aria-label="Contact hero section">
+            <!-- Background -->
+            <div class="absolute inset-0">
+                <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+                <!-- Grid Pattern -->
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,107,53,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,107,53,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
+                <div class="text-center max-w-4xl mx-auto">
+                    <!-- Page Title -->
+                    <div class="animate-fade-in-up opacity-0">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
+                            Get In <span class="text-orange-500">Touch</span>
+                        </h1>
+                    </div>
+                    
+                    <!-- Subtitle -->
+                    <div class="animate-fade-in-up opacity-0 [animation-delay:200ms]">
+                        <p class="text-sm sm:text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed px-2">
+                            Ready to start your fitness journey? Contact us today and let's transform your body together
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Methods Section -->
+        <section class="py-12 md:py-16 lg:py-20 bg-gray-900" aria-label="Contact methods">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Contact <span class="text-orange-500">Methods</span></h2>
+                    <p class="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2">Choose your preferred way to reach us</p>
+                </div>
+                
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
+                    <!-- WhatsApp -->
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl lg:rounded-2xl p-6 sm:p-8 text-center hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-green-500 to-green-400 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                            <i class="fab fa-whatsapp text-white text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">WhatsApp</h3>
+                        <p class="text-gray-400 text-sm sm:text-base leading-relaxed mb-4">Quick response guaranteed</p>
+                        <a href="{{ data.site.contact.whatsapp or '' }}" 
+                           target="_blank"
+                           class="inline-flex items-center bg-green-500 hover:bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105">
+                            <i class="fab fa-whatsapp mr-2"></i>Chat Now
+                        </a>
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl lg:rounded-2xl p-6 sm:p-8 text-center hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-blue-500 to-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                            <i class="fas fa-phone text-white text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Phone Call</h3>
+                        <p class="text-gray-400 text-sm sm:text-base leading-relaxed mb-4">Speak directly with our team</p>
+                        <a href="tel:{{ data.site.contact.phone or '+8801670442072' }}" 
+                           class="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-phone mr-2"></i>Call Now
+                        </a>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl lg:rounded-2xl p-6 sm:p-8 text-center hover:scale-105 transition-transform duration-300 sm:col-span-2 lg:col-span-1">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                            <i class="fas fa-envelope text-black text-lg sm:text-xl lg:text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Email</h3>
+                        <p class="text-gray-400 text-sm sm:text-base leading-relaxed mb-4">Send us a detailed message</p>
+                        <a href="mailto:{{ data.site.contact.email or 'astheticfitnessclub2022@gmail.com' }}" 
+                           class="inline-flex items-center bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-envelope mr-2"></i>Email Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Form & Info Section -->
+        <section class="py-12 md:py-16 lg:py-20 bg-black" aria-label="Contact form and information">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 max-w-7xl mx-auto">
+                    <!-- Contact Form -->
+                    <div class="space-y-6 lg:space-y-8">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6">Send us a <span class="text-orange-500">Message</span></h2>
+                            <p class="text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed">
+                                Fill out the form below and we'll get back to you within 24 hours.
+                            </p>
+                        </div>
+                        
+                        <form class="space-y-4 sm:space-y-6" aria-label="Contact form">
+                            <div class="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                                <div>
+                                    <label for="firstName" class="block text-white font-medium mb-2">First Name</label>
+                                    <input type="text" 
+                                           id="firstName" 
+                                           name="firstName" 
+                                           required
+                                           class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300"
+                                           placeholder="Your first name">
+                                </div>
+                                <div>
+                                    <label for="lastName" class="block text-white font-medium mb-2">Last Name</label>
+                                    <input type="text" 
+                                           id="lastName" 
+                                           name="lastName" 
+                                           required
+                                           class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300"
+                                           placeholder="Your last name">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="email" class="block text-white font-medium mb-2">Email Address</label>
+                                <input type="email" 
+                                       id="email" 
+                                       name="email" 
+                                       required
+                                       class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300"
+                                       placeholder="your.email@example.com">
+                            </div>
+                            
+                            <div>
+                                <label for="phone" class="block text-white font-medium mb-2">Phone Number</label>
+                                <input type="tel" 
+                                       id="phone" 
+                                       name="phone"
+                                       class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300"
+                                       placeholder="+880 XXX XXX XXXX">
+                            </div>
+                            
+                            <div>
+                                <label for="subject" class="block text-white font-medium mb-2">Subject</label>
+                                <select id="subject" 
+                                        name="subject" 
+                                        required
+                                        class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300">
+                                    <option value="">Select a subject</option>
+                                    <option value="membership">Membership Inquiry</option>
+                                    <option value="training">Personal Training</option>
+                                    <option value="schedule">Schedule Information</option>
+                                    <option value="pricing">Pricing Questions</option>
+                                    <option value="facilities">Facilities Tour</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="message" class="block text-white font-medium mb-2">Message</label>
+                                <textarea id="message" 
+                                          name="message" 
+                                          rows="6" 
+                                          required
+                                          class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300 resize-vertical"
+                                          placeholder="Tell us about your fitness goals and how we can help you..."></textarea>
+                            </div>
+                            
+                            <button type="submit" 
+                                    class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-8 py-4 rounded-full font-bold text-base md:text-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-black">
+                                <i class="fas fa-paper-plane mr-2"></i>Send Message
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Contact Information -->
+                    <div class="space-y-6 lg:space-y-8">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6">Contact <span class="text-orange-500">Information</span></h2>
+                            <p class="text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed">
+                                Visit us today or reach out through any of the following methods.
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <!-- Address -->
+                            <div class="flex items-start space-x-4 p-6 bg-gray-900/50 border border-gray-700 rounded-xl hover:bg-gray-900/70 transition-colors duration-300">
+                                <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-map-marker-alt text-black text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-bold text-lg mb-2">Visit Our Gym</h3>
+                                    <p class="text-gray-300 leading-relaxed">{{ data.site.location_address or 'F-224, M.rahaman complex, Gazipur' }}</p>
+                                    <a href="{{ data.site.location_link or 'https://maps.app.goo.gl/oV6P2uiy1TjgwixD8' }}" 
+                                       target="_blank"
+                                       class="inline-flex items-center text-orange-500 hover:text-orange-400 font-medium mt-2 transition-colors duration-300">
+                                        <i class="fas fa-directions mr-2"></i>Get Directions
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Phone -->
+                            <div class="flex items-start space-x-4 p-6 bg-gray-900/50 border border-gray-700 rounded-xl hover:bg-gray-900/70 transition-colors duration-300">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-phone text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-bold text-lg mb-2">Call Us</h3>
+                                    <p class="text-gray-300 leading-relaxed">{{ data.site.contact.phone or '+880 167 044 2072' }}</p>
+                                    <p class="text-gray-500 text-sm mt-1">Available during operating hours</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="flex items-start space-x-4 p-6 bg-gray-900/50 border border-gray-700 rounded-xl hover:bg-gray-900/70 transition-colors duration-300">
+                                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-envelope text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-bold text-lg mb-2">Email Us</h3>
+                                    <p class="text-gray-300 leading-relaxed break-all">{{ data.site.contact.email or 'astheticfitnessclub2022@gmail.com' }}</p>
+                                    <p class="text-gray-500 text-sm mt-1">We respond within 24 hours</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Operating Hours -->
+                            <div class="flex items-start space-x-4 p-6 bg-gray-900/50 border border-gray-700 rounded-xl hover:bg-gray-900/70 transition-colors duration-300">
+                                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-green-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-clock text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-bold text-lg mb-2">Operating Hours</h3>
+                                    <div class="text-gray-300 space-y-1">
+                                        <p>{{ data.stats.open_stats.days or 'Monday - Thursday, Saturday - Sunday' }}</p>
+                                        <p class="font-medium">{{ data.stats.open_stats.hours or '7:00 AM - 11:00 PM' }}</p>
+                                        <p class="text-gray-500 text-sm">Timezone: {{ data.site.timezone or 'Asia/Dhaka' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Social Media Links -->
+                        <div class="p-6 bg-gray-900/50 border border-gray-700 rounded-xl">
+                            <h3 class="text-white font-bold text-lg mb-4">Follow Us</h3>
+                            <div class="flex space-x-4">
+                                {% if data.site.social_links %}
+                                {% for social in data.site.social_links %}
+                                <a href="{{ social.url }}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer"
+                                   class="w-12 h-12 bg-gray-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-colors duration-300 group">
+                                    <i class="{{ social.icon }} text-gray-400 group-hover:text-black text-lg"></i>
+                                </a>
+                                {% endfor %}
+                                {% endif %}
+                                <a href="{{ data.site.contact.whatsapp or '' }}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer"
+                                   class="w-12 h-12 bg-gray-800 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors duration-300 group">
+                                    <i class="fab fa-whatsapp text-gray-400 group-hover:text-white text-lg"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="py-12 md:py-16 lg:py-20 bg-gray-900" aria-label="Location map">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Find <span class="text-orange-500">Us</span></h2>
+                    <p class="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2">Located in the heart of Gazipur for easy access</p>
+                </div>
+                
+                <div class="max-w-6xl mx-auto">
+                    <div class="bg-gray-800/50 border border-gray-700 rounded-2xl lg:rounded-3xl overflow-hidden">
+                        <div class="h-96 lg:h-[500px]" role="region" aria-label="Interactive map showing gym location">
+                            {% include '/components/location_map.html' %}
+                        </div>
+                        
+                        <!-- Map Info Overlay -->
+                        <div class="p-6 sm:p-8 bg-gray-800/70 backdrop-blur-sm">
+                            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-center">
+                                <div>
+                                    <h3 class="text-white font-bold mb-2">Address</h3>
+                                    <p class="text-gray-300 text-sm">{{ data.site.location_address or 'F-224, M.rahaman complex, Gazipur' }}</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-white font-bold mb-2">Parking</h3>
+                                    <p class="text-gray-300 text-sm">Free parking available</p>
+                                </div>
+                                <div class="sm:col-span-2 lg:col-span-1">
+                                    <h3 class="text-white font-bold mb-2">Public Transport</h3>
+                                    <p class="text-gray-300 text-sm">Bus stop nearby</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="py-12 md:py-16 lg:py-20 bg-black" aria-label="Frequently asked questions">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Frequently Asked <span class="text-orange-500">Questions</span></h2>
+                    <p class="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-2">Quick answers to common questions</p>
+                </div>
+                
+                <div class="max-w-4xl mx-auto space-y-4 sm:space-y-6">
+                    <div class="bg-gray-900/50 border border-gray-700 rounded-xl p-6 hover:bg-gray-900/70 transition-colors duration-300">
+                        <h3 class="text-white font-bold text-lg mb-3">What are your membership options?</h3>
+                        <p class="text-gray-300 leading-relaxed">We offer flexible membership plans including monthly, quarterly, and annual options. Visit our pricing page or contact us for detailed information.</p>
+                    </div>
+                    
+                    <div class="bg-gray-900/50 border border-gray-700 rounded-xl p-6 hover:bg-gray-900/70 transition-colors duration-300">
+                        <h3 class="text-white font-bold text-lg mb-3">Do you offer personal training?</h3>
+                        <p class="text-gray-300 leading-relaxed">Yes! Our certified trainers provide personalized workout plans and one-on-one coaching to help you achieve your specific fitness goals.</p>
+                    </div>
+                    
+                    <div class="bg-gray-900/50 border border-gray-700 rounded-xl p-6 hover:bg-gray-900/70 transition-colors duration-300">
+                        <h3 class="text-white font-bold text-lg mb-3">Can I visit for a tour before joining?</h3>
+                        <p class="text-gray-300 leading-relaxed">Absolutely! We encourage potential members to tour our facilities. Contact us to schedule a visit and see our equipment and amenities firsthand.</p>
+                    </div>
+                    
+                    <div class="bg-gray-900/50 border border-gray-700 rounded-xl p-6 hover:bg-gray-900/70 transition-colors duration-300">
+                        <h3 class="text-white font-bold text-lg mb-3">What should I bring for my first visit?</h3>
+                        <p class="text-gray-300 leading-relaxed">Bring comfortable workout clothes, athletic shoes, a water bottle, and a small towel. We provide all necessary equipment for your training sessions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-12 md:py-16 lg:py-20 xl:py-24 bg-gradient-to-r from-orange-500 to-yellow-500" aria-label="Call to action">
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4 sm:mb-6 leading-tight">
+                        Ready to Start Your Journey?
+                    </h2>
+                    
+                    <p class="text-black/80 text-sm sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-2">
+                        Contact us today and take the first step towards achieving your fitness goals
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center max-w-lg mx-auto">
+                        <a href="{{ data.site.contact.whatsapp or '' }}" 
+                           target="_blank"
+                           aria-label="Contact us on WhatsApp"
+                           class="w-full sm:w-auto bg-black hover:bg-gray-900 text-white px-6 sm:px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-sm sm:text-base md:text-lg transition-all duration-300 transform hover:scale-105">
+                            <i class="fab fa-whatsapp mr-2"></i>WhatsApp Us
+                        </a>
+                        
+                        <a href="/pricing" 
+                           aria-label="View our pricing plans"
+                           class="w-full sm:w-auto border-2 border-black/20 hover:border-black text-black hover:bg-black/10 px-6 sm:px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-sm sm:text-base md:text-lg transition-all duration-300">
+                            View Pricing
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+        
+    <!-- Footer -->
+    {% include '/components/footer.html' %}
+    
+    <!-- Smooth scrolling -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Form submission handling
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Simple validation
+            if (!data.firstName || !data.lastName || !data.email || !data.subject || !data.message) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Here you would typically send the data to your server
+            alert('Thank you for your message! We\'ll get back to you within 24 hours.');
+            this.reset();
+        });
+    </script>
+</body>
+</html>

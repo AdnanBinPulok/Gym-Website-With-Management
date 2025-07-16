@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>Login - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <meta name="description" content="Login to your {{ data.site.name or 'Aesthetic Fitness Gym' }} account to access your membership portal.">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s ease-in-out infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-black text-white overflow-x-hidden min-h-screen">
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-16 lg:pt-20 min-h-screen flex items-center justify-center">
+        <!-- Login Section -->
+        <section class="w-full py-12 md:py-20" aria-label="Login section">
+            <!-- Background -->
+            <div class="absolute inset-0">
+                <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+                <!-- Grid Pattern -->
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,107,53,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,107,53,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
+                <div class="max-w-md mx-auto">
+                    <!-- Login Card -->
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl lg:rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl shadow-orange-500/10">
+                        <!-- Logo and Title -->
+                        <div class="text-center mb-8">
+                            <div class="relative inline-block mb-6">
+                                {% if data.site.logo %}
+                                <img src="{{ data.site.logo }}" alt="{{ data.site.name or 'Aesthetic Fitness Gym' }}" 
+                                     class="w-16 h-16 sm:w-20 sm:h-20 object-contain mx-auto rounded-2xl shadow-2xl shadow-orange-500/25">
+                                {% else %}
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-2xl flex items-center justify-center mx-auto shadow-2xl shadow-orange-500/25">
+                                    <i class="fas fa-dumbbell text-black text-2xl sm:text-3xl"></i>
+                                </div>
+                                {% endif %}
+                                <!-- Glowing effect -->
+                                <div class="absolute inset-0 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-2xl blur-2xl opacity-20 -z-10"></div>
+                            </div>
+                            
+                            <h1 id="form-title" class="text-2xl sm:text-3xl font-bold text-white mb-2">Welcome Back</h1>
+                            <p id="form-subtitle" class="text-gray-400 text-sm sm:text-base">Sign in to your account</p>
+                        </div>
+                        
+                        <!-- Admin Registration Notice -->
+                        <div id="admin-notice" class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-6">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-info-circle text-blue-400 mt-0.5 flex-shrink-0"></i>
+                                <div>
+                                    <h3 class="text-blue-400 font-semibold text-sm mb-1">Registration Notice</h3>
+                                    <p class="text-blue-300 text-xs sm:text-sm leading-relaxed">
+                                        Only members registered by our admin can login. Your password will be auto-set on first login. 
+                                        Contact us if you need account access.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Login Form -->
+                        <div id="login-form-container">
+                            <form class="space-y-6" aria-label="Login form" id="login-form">
+                                <!-- Error Message -->
+                                <div id="error-message" class="hidden bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                                    <div class="flex items-start space-x-3">
+                                        <i class="fas fa-exclamation-triangle text-red-400 mt-0.5 flex-shrink-0"></i>
+                                        <div>
+                                            <h3 class="text-red-400 font-semibold text-sm mb-1">Login Failed</h3>
+                                            <p class="text-red-300 text-xs sm:text-sm" id="error-text"></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Email Field -->
+                                <div>
+                                    <label for="email" class="block text-white font-medium mb-2 text-sm sm:text-base">
+                                        <i class="fas fa-envelope mr-2 text-orange-500"></i>Email Address
+                                    </label>
+                                    <input type="email" 
+                                           id="email" 
+                                           name="email" 
+                                           required
+                                           autocomplete="email"
+                                           class="w-full px-4 py-3 sm:py-4 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300"
+                                           placeholder="Enter your email address">
+                                </div>
+                                
+                                <!-- Password Field -->
+                                <div>
+                                    <label for="password" class="block text-white font-medium mb-2 text-sm sm:text-base">
+                                        <i class="fas fa-lock mr-2 text-orange-500"></i>Password
+                                    </label>
+                                    <div class="relative">
+                                        <input type="password" 
+                                               id="password" 
+                                               name="password" 
+                                               required
+                                               autocomplete="current-password"
+                                               class="w-full px-4 py-3 sm:py-4 pr-12 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300"
+                                               placeholder="Enter your password">
+                                        <button type="button" 
+                                                id="toggle-password"
+                                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors duration-300"
+                                                aria-label="Toggle password visibility">
+                                            <i class="fas fa-eye" id="password-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Remember Me -->
+                                <div class="flex items-center justify-between">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" 
+                                               name="remember" 
+                                               class="w-4 h-4 text-orange-500 bg-gray-800 border-gray-600 rounded focus:ring-orange-500 focus:ring-2">
+                                        <span class="ml-2 text-gray-400 text-sm">Remember me</span>
+                                    </label>
+                                    <button type="button" 
+                                            id="forgot-password-btn"
+                                            class="text-orange-500 hover:text-orange-400 text-sm transition-colors duration-300">
+                                        Forgot password?
+                                    </button>
+                                </div>
+                                
+                                <!-- Login Button -->
+                                <button type="submit" 
+                                        id="login-btn"
+                                        class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                                    <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Forgot Password Form (Hidden by default) -->
+                        <div id="forgot-password-form-container" class="hidden">
+                            <form class="space-y-6" aria-label="Forgot password form" id="forgot-password-form">
+                                <!-- Error Message -->
+                                <div id="forgot-error-message" class="hidden bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                                    <div class="flex items-start space-x-3">
+                                        <i class="fas fa-exclamation-triangle text-red-400 mt-0.5 flex-shrink-0"></i>
+                                        <div>
+                                            <h3 class="text-red-400 font-semibold text-sm mb-1">Reset Failed</h3>
+                                            <p class="text-red-300 text-xs sm:text-sm" id="forgot-error-text"></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Success Message -->
+                                <div id="forgot-success-message" class="hidden bg-green-500/10 border border-green-500/30 rounded-xl p-4">
+                                    <div class="flex items-start space-x-3">
+                                        <i class="fas fa-check-circle text-green-400 mt-0.5 flex-shrink-0"></i>
+                                        <div>
+                                            <h3 class="text-green-400 font-semibold text-sm mb-1">Reset Email Sent</h3>
+                                            <p class="text-green-300 text-xs sm:text-sm" id="forgot-success-text"></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Email Field -->
+                                <div>
+                                    <label for="forgot-email" class="block text-white font-medium mb-2 text-sm sm:text-base">
+                                        <i class="fas fa-envelope mr-2 text-orange-500"></i>Email Address
+                                    </label>
+                                    <input type="email" 
+                                           id="forgot-email" 
+                                           name="email" 
+                                           required
+                                           autocomplete="email"
+                                           class="w-full px-4 py-3 sm:py-4 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300"
+                                           placeholder="Enter your email address">
+                                    <p class="text-gray-500 text-xs mt-2">We'll send you a link to reset your password</p>
+                                </div>
+                                
+                                <!-- Reset Button -->
+                                <button type="submit" 
+                                        id="forgot-submit-btn"
+                                        class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                                    <i class="fas fa-paper-plane mr-2"></i>Send Reset Link
+                                </button>
+
+                                <!-- Back to Login -->
+                                <button type="button" 
+                                        id="back-to-login-btn"
+                                        class="w-full border-2 border-gray-600 hover:border-orange-500 text-gray-300 hover:text-orange-500 px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300">
+                                    <i class="fas fa-arrow-left mr-2"></i>Back to Login
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Contact Admin -->
+                        <div id="contact-admin" class="mt-8 pt-6 border-t border-gray-700 text-center">
+                            <p class="text-gray-400 text-sm mb-4">Need an account or having trouble logging in?</p>
+                            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                <a href="{{ data.site.contact.whatsapp or '' }}" 
+                                   target="_blank"
+                                   class="inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 transform hover:scale-105">
+                                    <i class="fab fa-whatsapp mr-2"></i>Contact Admin
+                                </a>
+                                <a href="/contact" 
+                                   class="inline-flex items-center justify-center border border-gray-600 hover:border-orange-500 text-gray-300 hover:text-orange-500 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300">
+                                    <i class="fas fa-envelope mr-2"></i>Send Email
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Back to Home -->
+                        <div class="mt-6 text-center">
+                            <a href="/" 
+                               class="inline-flex items-center text-gray-500 hover:text-gray-300 text-sm transition-colors duration-300">
+                                <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Info -->
+                    <div class="mt-8 text-center">
+                        <div class="bg-gray-900/30 border border-gray-700 rounded-xl p-4">
+                            <h3 class="text-white font-semibold mb-2 text-sm">Quick Information</h3>
+                            <div class="space-y-2 text-xs text-gray-400">
+                                <p><i class="fas fa-clock mr-2 text-orange-500"></i>{{ data.stats.open_stats.days or 'Everyday' }}: {{ data.stats.open_stats.hours or '7:00 AM - 11:00 PM' }}</p>
+                                <p><i class="fas fa-phone mr-2 text-orange-500"></i>{{ data.site.contact.phone or '+880 167 044 2072' }}</p>
+                                <p><i class="fas fa-map-marker-alt mr-2 text-orange-500"></i>{{ data.site.location_address or 'F-224, M.rahaman complex, Gazipur' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+        
+    <!-- Footer -->
+    {% include '/components/footer.html' %}
+    
+    <!-- Scripts -->
+    <script>
+        // Password visibility toggle
+        document.getElementById('toggle-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('password-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            }
+        });
+        
+        // Hide error message functions
+        function hideErrorMessage() {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.classList.add('hidden');
+        }
+        
+        function hideForgotErrorMessage() {
+            const errorDiv = document.getElementById('forgot-error-message');
+            errorDiv.classList.add('hidden');
+        }
+        
+        function hideForgotSuccessMessage() {
+            const successDiv = document.getElementById('forgot-success-message');
+            successDiv.classList.add('hidden');
+        }
+        
+        // Show error message functions
+        function showErrorMessage(message) {
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function showForgotErrorMessage(message) {
+            const errorDiv = document.getElementById('forgot-error-message');
+            const errorText = document.getElementById('forgot-error-text');
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+            hideForgotSuccessMessage();
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function showForgotSuccessMessage(message) {
+            const successDiv = document.getElementById('forgot-success-message');
+            const successText = document.getElementById('forgot-success-text');
+            successText.textContent = message;
+            successDiv.classList.remove('hidden');
+            hideForgotErrorMessage();
+            successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // Toggle between login and forgot password forms
+        function showForgotPasswordForm() {
+            document.getElementById('login-form-container').classList.add('hidden');
+            document.getElementById('forgot-password-form-container').classList.remove('hidden');
+            document.getElementById('admin-notice').classList.add('hidden');
+            document.getElementById('form-title').textContent = 'Reset Password';
+            document.getElementById('form-subtitle').textContent = 'Enter your email to receive a reset link';
+            hideErrorMessage();
+            hideForgotErrorMessage();
+            hideForgotSuccessMessage();
+            
+            // Focus on email field
+            setTimeout(() => {
+                document.getElementById('forgot-email').focus();
+            }, 100);
+        }
+        
+        function showLoginForm() {
+            document.getElementById('forgot-password-form-container').classList.add('hidden');
+            document.getElementById('login-form-container').classList.remove('hidden');
+            document.getElementById('admin-notice').classList.remove('hidden');
+            document.getElementById('form-title').textContent = 'Welcome Back';
+            document.getElementById('form-subtitle').textContent = 'Sign in to your account';
+            hideErrorMessage();
+            hideForgotErrorMessage();
+            hideForgotSuccessMessage();
+            
+            // Focus on email field
+            setTimeout(() => {
+                document.getElementById('email').focus();
+            }, 100);
+        }
+        
+        // Event listeners for form switching
+        document.getElementById('forgot-password-btn').addEventListener('click', showForgotPasswordForm);
+        document.getElementById('back-to-login-btn').addEventListener('click', showLoginForm);
+        
+        // Login form submission
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideErrorMessage();
+            
+            const formData = new FormData(this);
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const remember = formData.get('remember') ? true : false;
+            
+            if (!email || !password) {
+                showErrorMessage('Please fill in all fields.');
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showErrorMessage('Please enter a valid email address.');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('login-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Signing In...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, remember })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    const errorMessage = data.message || data.error || 'Failed to login';
+                    showErrorMessage(errorMessage);
+                } else {
+                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Login Successful!';
+                    submitBtn.classList.remove('from-orange-500', 'to-yellow-500');
+                    submitBtn.classList.add('from-green-500', 'to-green-400');
+                    
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-6';
+                    successDiv.innerHTML = `
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check-circle text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <h3 class="text-green-400 font-semibold text-sm mb-1">Login Successful</h3>
+                                <p class="text-green-300 text-xs sm:text-sm">Redirecting to your profile...</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    this.insertBefore(successDiv, this.firstChild);
+                    
+                    setTimeout(() => {
+                        window.location.href = '/account';
+                    }, 1000);
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showErrorMessage('Connection error. Please check your internet connection and try again.');
+            } finally {
+                if (submitBtn.innerHTML.includes('spinner')) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+        });
+        
+        // Forgot password form submission
+        document.getElementById('forgot-password-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideForgotErrorMessage();
+            hideForgotSuccessMessage();
+            
+            const formData = new FormData(this);
+            const email = formData.get('email');
+            
+            if (!email) {
+                showForgotErrorMessage('Please enter your email address.');
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showForgotErrorMessage('Please enter a valid email address.');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('forgot-submit-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    const errorMessage = data.message || data.error || 'Failed to send reset email';
+                    showForgotErrorMessage(errorMessage);
+                } else {
+                    const successMessage = data.message || 'Password reset link has been sent to your email address.';
+                    showForgotSuccessMessage(successMessage);
+                    this.reset();
+                }
+                
+            } catch (error) {
+                console.error('Forgot password error:', error);
+                showForgotErrorMessage('Connection error. Please check your internet connection and try again.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // Auto-focus email field on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('email').focus();
+        });
+        
+        // Hide error messages when user starts typing
+        document.getElementById('email').addEventListener('input', hideErrorMessage);
+        document.getElementById('password').addEventListener('input', hideErrorMessage);
+        document.getElementById('forgot-email').addEventListener('input', function() {
+            hideForgotErrorMessage();
+            hideForgotSuccessMessage();
+        });
+    </script>
+</body>
+</html>

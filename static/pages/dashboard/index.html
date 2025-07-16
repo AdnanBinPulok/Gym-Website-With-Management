@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <meta name="description" content="{{ data.site.meta_description or 'Aesthetic Fitness Gym is the best place to achieve your fitness goals!' }}">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Dark theme styles to match dashboard */
+        body {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+    </style>
+</head>
+<body>
+    {% set active_page = 'dashboard' %}
+    {% include 'components/dashboard-sidebar.html' %}
+    <div class="lg:ml-64 min-h-screen p-2 md:p-4 lg:p-6">
+        <div class="border border-slate-600 rounded-lg shadow-lg p-6 mb-2">
+            <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+            <p class="text-gray-400">Welcome back, {{ data.user.full_name or 'Admin' }}!</p>
+        </div>
+        
+        <!-- state cards -->
+        <div class="rounded-lg border border-slate-600 p-6">
+            <h2 class="text-2xl font-bold mb-4">Stats</h2>
+            <div class="stat-cards flex flex-col md:flex-row gap-4">
+                <div class="w-full border border-slate-600 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold">Total Members</h3>
+                    <!-- loading -->
+                    <p class="text-2xl font-bold text-green-400" id="total-members"><i class="fas fa-spinner fa-spin"></i></p>
+                </div>
+                <div class="w-full border border-slate-600 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold">Active Subscriptions</h3>
+                    <!-- loading -->
+                    <p class="text-2xl font-bold text-blue-400" id="active-subscriptions"><i class="fas fa-spinner fa-spin"></i></p>
+                </div>
+                <div class="w-full border border-slate-600 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold">Expired Subscriptions</h3>
+                    <!-- loading -->
+                    <p class="text-2xl font-bold text-yellow-400" id="expired-subscriptions"><i class="fas fa-spinner fa-spin"></i></p>
+                </div>
+                <div class="w-full border border-slate-600 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold">Expiring Subscriptions</h3>
+                    <!-- loading -->
+                    <p class="text-2xl font-bold text-red-400" id="expiring-subscriptions"><i class="fas fa-spinner fa-spin"></i></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    let stateData = {};
+    
+    async function fetchStats() {
+        try {
+            const response = await fetch('/api/get-dashboard-stats');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            
+            if (data.success) {
+                stateData = data.stats || {};
+                renderStats();
+            }
+            else {
+                console.error('Failed to fetch stats:', data.message);
+                // Show error state
+                showErrorState();
+            }
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+            showErrorState();
+        }
+    }
+
+    function renderStats() {
+        document.getElementById('total-members').textContent = stateData.total_members || '0';
+        document.getElementById('active-subscriptions').textContent = stateData.active_subscriptions || '0';
+        document.getElementById('expired-subscriptions').textContent = stateData.expired_subscriptions || '0';
+        document.getElementById('expiring-subscriptions').textContent = stateData.expiring_subscriptions || '0';
+    }
+
+    function showErrorState() {
+        document.getElementById('total-members').innerHTML = '<i class="fas fa-exclamation-triangle text-red-400"></i>';
+        document.getElementById('active-subscriptions').innerHTML = '<i class="fas fa-exclamation-triangle text-red-400"></i>';
+        document.getElementById('expired-subscriptions').innerHTML = '<i class="fas fa-exclamation-triangle text-red-400"></i>';
+        document.getElementById('expiring-subscriptions').innerHTML = '<i class="fas fa-exclamation-triangle text-red-400"></i>';
+    }
+
+    async function autoUpdateStats() {
+        try {
+            await fetchStats();
+            setTimeout(autoUpdateStats, 5000); // Update every 5 seconds
+        } catch (error) {
+            console.error('Error during auto-update:', error);
+            setTimeout(autoUpdateStats, 10000); // Retry after 10 seconds on error
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        autoUpdateStats();
+    });
+</script>
+</html>

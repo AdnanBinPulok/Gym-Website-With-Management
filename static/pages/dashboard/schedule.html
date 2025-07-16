@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Management - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <meta name="description" content="{{ data.site.meta_description or 'Aesthetic Fitness Gym is the best place to achieve your fitness goals!' }}">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Dark theme styles to match dashboard */
+        body {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+        
+        .gender-male { background: linear-gradient(45deg, #3b82f6, #2563eb); }
+        .gender-female { background: linear-gradient(45deg, #ec4899, #be185d); }
+        .gender-all { background: linear-gradient(45deg, #10b981, #059669); }
+        
+        .slot-closed { 
+            background: linear-gradient(45deg, #6b7280, #4b5563); 
+            opacity: 0.6;
+        }
+        
+        .time-slot {
+            transition: all 0.3s ease;
+        }
+        
+        .time-slot:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    {% set active_page = 'schedule' %}
+    {% include 'components/dashboard-sidebar.html' %}
+    <div class="lg:ml-64 min-h-screen p-2 md:p-4 lg:p-6">
+        <div class="border border-slate-600 rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold">Schedule Management</h1>
+                    <p class="text-gray-400">Manage gym operating hours and gender-specific time slots</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="save-btn" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-400 transition-colors font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-save mr-2"></i>Save Changes
+                    </button>
+                    <button id="reset-btn" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors font-semibold shadow-lg">
+                        <i class="fas fa-undo mr-2"></i>Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="border border-slate-600 rounded-lg shadow-lg p-4 mb-6">
+            <h3 class="text-lg font-semibold mb-4">Legend</h3>
+            <div class="flex flex-wrap gap-4">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded gender-male mr-2"></div>
+                    <span class="text-sm">Male Only</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded gender-female mr-2"></div>
+                    <span class="text-sm">Female Only</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded gender-all mr-2"></div>
+                    <span class="text-sm">All Genders</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded slot-closed mr-2"></div>
+                    <span class="text-sm">Closed</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="schedule-container border border-slate-600 rounded-lg shadow-lg p-6">
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-4xl text-blue-400"></i>
+                <p class="text-gray-400 mt-2">Loading schedule...</p>
+            </div>
+            
+            <!-- Schedule Grid -->
+            <div id="schedule-grid" class="hidden">
+                <h2 class="text-2xl font-bold mb-6">Weekly Schedule</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="days-container">
+                    <!-- Days will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Error State -->
+            <div id="error-state" class="text-center py-8 hidden">
+                <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+                <p class="text-gray-400 mt-2">Error loading schedule. Please try again.</p>
+                <button onclick="fetchSchedule()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition-colors mt-4">
+                    <i class="fas fa-refresh mr-2"></i>Retry
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Slot Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden backdrop-blur-sm">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl max-w-md w-full shadow-2xl border border-slate-700/50">
+                <div class="sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 p-6 rounded-t-xl border-b border-slate-600/50">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <i class="fas fa-edit mr-3 text-blue-400"></i>
+                            Edit Time Slot
+                        </h2>
+                        <button onclick="closeEditModal()" class="text-gray-400 hover:text-white text-2xl transition-colors duration-200 hover:bg-slate-600 p-2 rounded-lg">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <form id="edit-form">
+                        <input type="hidden" id="edit-day">
+                        <input type="hidden" id="edit-index">
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-300 text-sm mb-2">Day:</label>
+                            <input type="text" id="edit-day-display" readonly class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 opacity-50">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-300 text-sm mb-2">Gender:</label>
+                            <select id="edit-gender" class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                                <option value="male">Male Only</option>
+                                <option value="female">Female Only</option>
+                                <option value="all">All Genders</option>
+                            </select>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-gray-300 text-sm mb-2">Start Time:</label>
+                                <input type="time" id="edit-start-time" class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm mb-2">End Time:</label>
+                                <input type="time" id="edit-end-time" class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="edit-is-open" class="mr-2">
+                                <span class="text-gray-300">Open for business</span>
+                            </label>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button type="button" onclick="closeEditModal()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors">
+                                <i class="fas fa-save mr-2"></i>Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    let scheduleData = {};
+    let originalScheduleData = {};
+    
+    // Fetch schedule from API
+    async function fetchSchedule() {
+        try {
+            showLoading();
+            
+            const response = await fetch('/api/get-schedule');
+            if (!response.ok) {
+                throw new Error('Failed to fetch schedule');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                scheduleData = data.data || {};
+                originalScheduleData = JSON.parse(JSON.stringify(scheduleData));
+                renderSchedule();
+                updateSaveButton();
+            } else {
+                throw new Error(data.message || 'Failed to fetch schedule');
+            }
+            
+        } catch (error) {
+            console.error('Error fetching schedule:', error);
+            showError();
+        }
+    }
+    
+    // Save schedule - Push all data to API
+    async function saveSchedule() {
+        try {
+            const saveBtn = document.getElementById('save-btn');
+            const originalText = saveBtn.innerHTML;
+            
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+            
+            // Send the entire scheduleData object to /api/save-schedule
+            const response = await fetch('/api/save-schedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(scheduleData)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to save schedule');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                originalScheduleData = JSON.parse(JSON.stringify(scheduleData));
+                updateSaveButton();
+                showSuccessMessage('Schedule saved successfully!');
+            } else {
+                throw new Error(data.message || 'Failed to save schedule');
+            }
+            
+        } catch (error) {
+            console.error('Error saving schedule:', error);
+            showErrorMessage('Failed to save schedule. Please try again.');
+        } finally {
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Save Changes';
+        }
+    }
+
+    // Render schedule
+    function renderSchedule() {
+        const container = document.getElementById('days-container');
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        
+        container.innerHTML = days.map(day => createDayCard(day, scheduleData[day] || [])).join('');
+        
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('schedule-grid').classList.remove('hidden');
+        document.getElementById('error-state').classList.add('hidden');
+    }
+    
+    // Create day card HTML
+    function createDayCard(day, slots) {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+        
+        return `
+            <div class="day-card bg-slate-800 rounded-lg p-4 border border-slate-600">
+                <h3 class="text-xl font-bold mb-4 text-center">${dayName}</h3>
+                <div class="space-y-3">
+                    ${slots.map((slot, index) => createTimeSlot(day, slot, index)).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Create time slot HTML
+    function createTimeSlot(day, slot, index) {
+        const genderClass = slot.is_open ? `gender-${slot.gender}` : 'slot-closed';
+        const genderIcon = {
+            'male': 'fas fa-mars',
+            'female': 'fas fa-venus',
+            'all': 'fas fa-users'
+        };
+        
+        const statusText = slot.is_open ? 'Open' : 'Closed';
+        const statusIcon = slot.is_open ? 'fas fa-check-circle' : 'fas fa-times-circle';
+        
+        return `
+            <div class="time-slot ${genderClass} rounded-lg p-3 text-white cursor-pointer" onclick="editSlot('${day}', ${index})">
+                <div class="flex justify-between items-center mb-2">
+                    <div class="flex items-center">
+                        <i class="${genderIcon[slot.gender]} mr-2"></i>
+                        <span class="font-semibold">${slot.gender.charAt(0).toUpperCase() + slot.gender.slice(1)}</span>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <i class="${statusIcon} mr-1"></i>
+                        <span>${statusText}</span>
+                    </div>
+                </div>
+                <div class="text-sm">
+                    <div class="flex justify-between">
+                        <span>Start:</span>
+                        <span class="font-semibold">${slot.start_time}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>End:</span>
+                        <span class="font-semibold">${slot.end_time}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Edit slot functionality
+    function editSlot(day, index) {
+        const slot = scheduleData[day][index];
+        
+        document.getElementById('edit-day').value = day;
+        document.getElementById('edit-index').value = index;
+        document.getElementById('edit-day-display').value = day.charAt(0).toUpperCase() + day.slice(1);
+        document.getElementById('edit-gender').value = slot.gender;
+        document.getElementById('edit-start-time').value = convertTo24Hour(slot.start_time);
+        document.getElementById('edit-end-time').value = convertTo24Hour(slot.end_time);
+        document.getElementById('edit-is-open').checked = slot.is_open;
+        
+        document.getElementById('edit-modal').classList.remove('hidden');
+    }
+    
+    // Convert 12-hour format to 24-hour format
+    function convertTo24Hour(time12h) {
+        const [time, modifier] = time12h.split(' ');
+        let [hours, minutes] = time.split(':');
+        if (hours === '12') {
+            hours = '00';
+        }
+        if (modifier === 'PM') {
+            hours = parseInt(hours, 10) + 12;
+        }
+        return `${hours}:${minutes}`;
+    }
+    
+    // Convert 24-hour format to 12-hour format
+    function convertTo12Hour(time24h) {
+        const [hours, minutes] = time24h.split(':');
+        const hour = parseInt(hours, 10);
+        const modifier = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+        return `${displayHour}:${minutes} ${modifier}`;
+    }
+    
+    // Close edit modal
+    function closeEditModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+    }
+    
+    // Handle edit form submission
+    document.getElementById('edit-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const day = document.getElementById('edit-day').value;
+        const index = parseInt(document.getElementById('edit-index').value);
+        const gender = document.getElementById('edit-gender').value;
+        const startTime = convertTo12Hour(document.getElementById('edit-start-time').value);
+        const endTime = convertTo12Hour(document.getElementById('edit-end-time').value);
+        const isOpen = document.getElementById('edit-is-open').checked;
+        
+        // Update schedule data
+        scheduleData[day][index] = {
+            gender: gender,
+            start_time: startTime,
+            end_time: endTime,
+            is_open: isOpen
+        };
+        
+        // Re-render schedule
+        renderSchedule();
+        updateSaveButton();
+        closeEditModal();
+        
+        showSuccessMessage('Time slot updated successfully!');
+    });
+    
+    // Reset schedule
+    function resetSchedule() {
+        scheduleData = JSON.parse(JSON.stringify(originalScheduleData));
+        renderSchedule();
+        updateSaveButton();
+        showSuccessMessage('Schedule reset to last saved version!');
+    }
+    
+    // Update save button state
+    function updateSaveButton() {
+        const saveBtn = document.getElementById('save-btn');
+        const hasChanges = JSON.stringify(scheduleData) !== JSON.stringify(originalScheduleData);
+        
+        if (hasChanges) {
+            saveBtn.classList.remove('opacity-50');
+            saveBtn.disabled = false;
+        } else {
+            saveBtn.classList.add('opacity-50');
+            saveBtn.disabled = true;
+        }
+    }
+    
+    // Utility functions
+    function showLoading() {
+        document.getElementById('loading-state').classList.remove('hidden');
+        document.getElementById('schedule-grid').classList.add('hidden');
+        document.getElementById('error-state').classList.add('hidden');
+    }
+    
+    function showError() {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('schedule-grid').classList.add('hidden');
+        document.getElementById('error-state').classList.remove('hidden');
+    }
+    
+    // Success/Error messages
+    function showSuccessMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    function showErrorMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    // Event listeners
+    document.getElementById('save-btn').addEventListener('click', saveSchedule);
+    document.getElementById('reset-btn').addEventListener('click', resetSchedule);
+    
+    // Close modal when clicking outside
+    document.getElementById('edit-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const editModal = document.getElementById('edit-modal');
+            if (!editModal.classList.contains('hidden')) {
+                closeEditModal();
+            }
+        }
+    });
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchSchedule();
+    });
+</script>
+</body>
+</html>

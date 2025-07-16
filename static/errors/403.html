@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Maintenance - {{ data.site.name }}</title>
+    <meta name="description" content="{{ data.site.name }} is currently under maintenance. We'll be back shortly with improved services.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #6c757d;
+            --accent-color: #007bff;
+            --border-color: #dee2e6;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --accent-color: #0d6efd;
+            --border-color: #444444;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .maintenance-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        
+        .maintenance-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            overflow: hidden;
+        }
+        
+        .maintenance-header {
+            background: linear-gradient(135deg, var(--accent-color), #0056b3);
+            color: white;
+            padding: 2rem;
+        }
+        
+        .maintenance-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+        
+        .maintenance-content {
+            padding: 2rem;
+        }
+        
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .countdown-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            min-width: 80px;
+        }
+        
+        .countdown-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: block;
+        }
+        
+        .countdown-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-primary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), #0056b3);
+            width: 0%;
+            animation: progress 120s linear infinite;
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .countdown-container {
+                gap: 0.75rem;
+            }
+            
+            .countdown-item {
+                padding: 0.75rem;
+                min-width: 60px;
+            }
+            
+            .countdown-number {
+                font-size: 1.25rem;
+            }
+            
+            .maintenance-header {
+                padding: 1.5rem;
+            }
+            
+            .maintenance-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="maintenance-container">
+        <div class="maintenance-card">
+            <div class="maintenance-header">
+                <div class="maintenance-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Server Maintenance</h1>
+                <p class="text-lg opacity-90">We're making improvements to serve you better</p>
+            </div>
+            
+            <div class="maintenance-content">
+                <h2 class="text-xl font-semibold mb-4" style="color: var(--text-primary);">
+                    {{ data.site.name }} is Currently Under Maintenance
+                </h2>
+                
+                <p class="mb-6" style="color: var(--text-secondary);">
+                    Our team is working hard to improve our services and add exciting new features. 
+                    We appreciate your patience and will be back online shortly.
+                </p>
+                
+                <div class="countdown-container">
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="hours">--</span>
+                        <span class="countdown-label">Hours</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="minutes">--</span>
+                        <span class="countdown-label">Minutes</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="seconds">--</span>
+                        <span class="countdown-label">Seconds</span>
+                    </div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h3 class="font-semibold text-blue-800 mb-2">What's Coming:</h3>
+                    <ul class="text-blue-700 text-sm space-y-1">
+                        <li>• Enhanced performance and speed</li>
+                        <li>• New social media services</li>
+                        <li>• Improved user dashboard</li>
+                        <li>• Better security features</li>
+                    </ul>
+                </div>
+                
+                <p class="text-sm mb-4" style="color: var(--text-secondary);">
+                    <strong>Estimated completion:</strong> 
+                    <span id="estimated-time">Within 2 hours</span>
+                </p>
+                
+                <div class="social-links">
+                    {% if data.site %}
+                        {% if data.site.contact %}
+                            {% if data.site.contact.email %}
+                                <a href="mailto:{{data.site.contact.email or ''}}" class="social-link" title="Email Support">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            {% endif %}
+                            <a href="#" class="social-link" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Facebook">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                
+                <p class="text-xs mt-6" style="color: var(--text-secondary);">
+                    For urgent matters, please contact us at 
+                    <a href="mailto:{{data.site.contact.email or ''}}" style="color: var(--accent-color);">{{data.site.contact.email or ''}}</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Countdown timer (example: 2 hours from now)
+        const targetTime = new Date().getTime() + (2 * 60 * 60 * 1000);
+        
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetTime - now;
+            
+            if (difference > 0) {
+                const hours = Math.floor(difference / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            } else {
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+            }
+        }
+        
+        // Update countdown every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        
+        // Auto-refresh page every 5 minutes
+        setTimeout(() => {
+            location.reload();
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>Account Settings - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <meta name="description" content="Manage your account settings and preferences for {{ data.site.name or 'Aesthetic Fitness Gym' }}.">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+    {% set active_sidebar = 'settings' %}
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-16 lg:pt-20">
+        <section class="relative py-12 md:py-16 bg-black overflow-hidden">
+            <div class="absolute inset-0">
+                <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,107,53,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,107,53,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+                    <div class="lg:col-span-4">
+                        <div class="grid lg:grid-cols-4 gap-8 h-full">
+                            <!-- Sidebar -->
+                            <div class="lg:col-span-1 flex">
+                                <div class="w-full">
+                                    {% include '/components/account-sidebar.html' %}
+                                </div>
+                            </div>
+                            
+                            <!-- Main Content -->
+                            <div class="lg:col-span-3 space-y-8">
+                                <!-- Page Header -->
+                                <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-3xl p-8">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl flex items-center justify-center">
+                                            <i class="fas fa-cog text-white text-2xl"></i>
+                                        </div>
+                                        <div>
+                                            <h1 class="text-3xl lg:text-4xl font-bold text-white mb-2">Account Settings</h1>
+                                            <p class="text-gray-400">Manage your preferences and notifications</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Profile Information -->
+                                <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-8">
+                                    <h2 class="text-2xl font-bold text-white mb-6">Profile Information</h2>
+                                    
+                                    <form class="space-y-6">
+                                        <div class="grid md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label class="block text-white font-medium mb-2">Full Name</label>
+                                                <input type="text" id="full_name" name="full_name"
+                                                       value="{{ data.user.full_name or '' }}"
+                                                       class="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300">
+                                            </div>
+                                            
+                                            <div>
+                                                <label class="block text-white font-medium mb-2">Phone Number</label>
+                                                <input type="tel" 
+                                                       value="{{ data.user.phone or '' }}"
+                                                       disabled
+                                                       class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-gray-400 cursor-not-allowed">
+                                                <p class="text-xs text-gray-500 mt-1">Phone number cannot be changed from here. Contact support if needed.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-white font-medium mb-2">Email Address</label>
+                                            <input type="email" 
+                                                   value="{{ data.user.email }}"
+                                                   disabled
+                                                   class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-gray-400 cursor-not-allowed">
+                                            <p class="text-xs text-gray-500 mt-1">Email cannot be changed from here. Contact support if needed.</p>
+                                        </div>
+                                        
+                                        <button type="submit" onsubmit="saveSettings(event)"
+                                                class="bg-gradient-to-r from-orange-500 to-yellow-500 text-black px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300">
+                                            Save Changes
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+        
+    <!-- Custom Alert -->
+    <div id="custom-alert" class="fixed top-24 right-5 w-full max-w-xs p-4 rounded-xl shadow-lg text-white z-50 transition-transform duration-500 ease-in-out translate-x-[150%]" style="visibility: hidden;">
+        <div class="flex items-start">
+            <div class="flex-shrink-0 pt-0.5">
+                <i id="alert-icon" class="fas fa-2x"></i>
+            </div>
+            <div class="ml-4 w-0 flex-1">
+                <p id="alert-title" class="text-lg font-bold"></p>
+                <p id="alert-message" class="mt-1 text-sm"></p>
+            </div>
+            <div class="ml-4 flex-shrink-0 flex">
+                <button id="close-alert-btn" class="inline-flex text-white hover:text-gray-300 focus:outline-none">
+                    <span class="sr-only">Close</span>
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    {% include '/components/footer.html' %}
+</body>
+<script>
+    let alertTimeout;
+
+    function showAlert(title, message, type = 'success') {
+        const alertElement = document.getElementById('custom-alert');
+        const alertTitle = document.getElementById('alert-title');
+        const alertMessage = document.getElementById('alert-message');
+        const alertIcon = document.getElementById('alert-icon');
+
+        // Clear previous timeout if exists
+        clearTimeout(alertTimeout);
+
+        alertTitle.textContent = title;
+        alertMessage.textContent = message;
+
+        // Reset classes
+        alertElement.classList.remove('bg-gradient-to-r', 'from-green-500', 'to-blue-500', 'from-red-500', 'to-orange-500');
+        alertIcon.classList.remove('fa-check-circle', 'fa-exclamation-triangle');
+
+        if (type === 'success') {
+            alertElement.classList.add('bg-gradient-to-r', 'from-green-500', 'to-blue-500');
+            alertIcon.classList.add('fa-check-circle');
+        } else {
+            alertElement.classList.add('bg-gradient-to-r', 'from-red-500', 'to-orange-500');
+            alertIcon.classList.add('fa-exclamation-triangle');
+        }
+
+        alertElement.style.visibility = 'visible';
+        alertElement.classList.remove('translate-x-[150%]');
+        
+        alertTimeout = setTimeout(hideAlert, 5000);
+    }
+
+    function hideAlert() {
+        const alertElement = document.getElementById('custom-alert');
+        alertElement.classList.add('translate-x-[150%]');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('close-alert-btn').addEventListener('click', hideAlert);
+        
+        const form = document.querySelector('form');
+        form.addEventListener('submit', saveSettings);
+    });
+
+    function saveSettings(event) {
+        event.preventDefault();
+        const saveButton = event.target.querySelector('button[type="submit"]');
+        const originalButtonText = saveButton.innerHTML;
+        saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        saveButton.disabled = true;
+
+        try {
+            const full_name = document.getElementById('full_name').value;
+            fetch('/api/save-settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    full_name: full_name,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert("Success!", "Settings saved successfully!");
+                    // reload the page to reflect changes
+                    setTimeout(() => {  
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showAlert("Save Failed", data.message || "Could not save settings.", 'error');
+                }
+            })
+            .catch(error => {
+                console.error("Error saving settings:", error);
+                showAlert("Error", "An unexpected error occurred. Please try again.", 'error');
+            })
+            .finally(() => {
+                saveButton.innerHTML = originalButtonText;
+                saveButton.disabled = false;
+            });
+        } catch (error) {
+            console.error("Error in saveSettings function:", error);
+            showAlert("Client Error", "An error occurred in the browser.", 'error');
+            saveButton.innerHTML = originalButtonText;
+            saveButton.disabled = false;
+        }
+    }
+</script>
+</html>

@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <meta name="description" content="{{ data.site.meta_description or 'Aesthetic Fitness Gym is the best place to achieve your fitness goals!' }}">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Dark theme styles to match dashboard */
+        body {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+    </style>
+</head>
+<body>
+    {% set active_page = 'settings' %}
+    {% include 'components/dashboard-sidebar.html' %}
+    <div class="lg:ml-64 min-h-screen p-2 md:p-4 lg:p-6">
+        <div class="border border-slate-600 rounded-lg shadow-lg p-4 sm:p-6 mb-2">
+            <h1 class="text-xl sm:text-2xl font-bold">Settings</h1>
+            <p class="text-gray-400 text-sm sm:text-base">Configure gym system settings and preferences</p>
+        </div>
+
+        <div class="settings-container border border-slate-600 rounded-lg shadow-lg p-4 sm:p-6">
+            <!-- Logo and Favicon Section -->
+            <div class="mb-8">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold">Logo & Favicon</h2>
+                        <p class="text-gray-400 text-sm sm:text-base">Upload your gym's logo and favicon</p>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="branding-loading" class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-2xl text-blue-400"></i>
+                    <p class="text-gray-400 mt-2">Loading branding assets...</p>
+                </div>
+                
+                <!-- Branding Content -->
+                <div id="branding-content" class="hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Logo Upload -->
+                        <div class="bg-slate-800 rounded-lg p-6 border border-slate-600">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-image mr-3 text-blue-400 text-xl"></i>
+                                <h3 class="text-lg font-semibold">Logo</h3>
+                            </div>
+                            
+                            <!-- Current Logo -->
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-400 mb-2">Current Logo:</p>
+                                <div class="bg-slate-700 rounded-lg p-4 flex items-center justify-center h-32 border border-slate-600">
+                                    <img id="current-logo" src="" alt="Current Logo" class="max-h-full max-w-full object-contain" style="display: none;">
+                                    <div id="logo-placeholder" class="text-gray-500 text-center">
+                                        <i class="fas fa-image text-2xl mb-2"></i>
+                                        <p class="text-sm">No logo uploaded</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Upload Logo -->
+                            <div>
+                                <input type="file" id="logo-input" accept="image/*" class="hidden">
+                                <button onclick="document.getElementById('logo-input').click()" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition-colors">
+                                    <i class="fas fa-upload mr-2"></i>Upload New Logo
+                                </button>
+                                <p class="text-xs text-gray-400 mt-2">Required: 1:1 ratio, Max: 2MB, Formats: JPG, PNG, GIF</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Favicon Upload -->
+                        <div class="bg-slate-800 rounded-lg p-6 border border-slate-600">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-star mr-3 text-yellow-400 text-xl"></i>
+                                <h3 class="text-lg font-semibold">Favicon</h3>
+                            </div>
+                            
+                            <!-- Current Favicon -->
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-400 mb-2">Current Favicon:</p>
+                                <div class="bg-slate-700 rounded-lg p-4 flex items-center justify-center h-32 border border-slate-600">
+                                    <img id="current-favicon" src="" alt="Current Favicon" class="max-h-full max-w-full object-contain" style="display: none;">
+                                    <div id="favicon-placeholder" class="text-gray-500 text-center">
+                                        <i class="fas fa-star text-2xl mb-2"></i>
+                                        <p class="text-sm">No favicon uploaded</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Upload Favicon -->
+                            <div>
+                                <input type="file" id="favicon-input" accept="image/*" class="hidden">
+                                <button onclick="document.getElementById('favicon-input').click()" class="w-full bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-400 transition-colors">
+                                    <i class="fas fa-upload mr-2"></i>Upload New Favicon
+                                </button>
+                                <p class="text-xs text-gray-400 mt-2">Required: 1:1 ratio, Max: 2MB, Formats: JPG, PNG, GIF</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Guidelines -->
+                    <div class="mt-6 bg-blue-900/30 border border-blue-500/50 rounded-lg p-4">
+                        <div class="flex items-start text-blue-400">
+                            <i class="fas fa-info-circle mr-3 mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold mb-2">Upload Guidelines</h4>
+                                <ul class="text-sm text-blue-300 space-y-1">
+                                    <li>• <strong>Logo:</strong> Used on website headers, business cards, and marketing materials</li>
+                                    <li>• <strong>Favicon:</strong> Small icon displayed in browser tabs and bookmarks</li>
+                                    <li>• Both images must be square (1:1 aspect ratio) for best results</li>
+                                    <li>• Maximum file size: 2MB per image</li>
+                                    <li>• Supported formats: JPG, PNG, GIF</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Error State -->
+                <div id="branding-error" class="text-center py-8 hidden">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">Error Loading Branding</h3>
+                    <p class="text-gray-500 mb-4">Failed to load logo and favicon</p>
+                    <button onclick="fetchBranding()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition-colors">
+                        <i class="fas fa-retry mr-2"></i>Try Again
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Social Links Section -->
+            <div class="mb-8">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold">Social Links</h2>
+                        <p class="text-gray-400 text-sm sm:text-base">Manage your gym's social media presence</p>
+                    </div>
+                    <button id="add-social-btn" class="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Add Social Link
+                    </button>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="social-loading" class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-2xl text-blue-400"></i>
+                    <p class="text-gray-400 mt-2">Loading social links...</p>
+                </div>
+                
+                <!-- Social Links List -->
+                <div id="social-links-container" class="space-y-4 hidden">
+                    <!-- Social links will be populated by JavaScript -->
+                </div>
+                
+                <!-- No Links State -->
+                <div id="no-social-links" class="text-center py-8 hidden">
+                    <i class="fas fa-share-alt text-4xl text-gray-500 mb-4"></i>
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">No Social Links</h3>
+                    <p class="text-gray-500 mb-4">Add your first social media link to get started</p>
+                    <button onclick="openSocialModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Add Social Link
+                    </button>
+                </div>
+                
+                <!-- Save Button -->
+                <div class="mt-6 flex justify-end">
+                    <button id="save-social-btn" class="w-full sm:w-auto bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-400 transition-colors font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-save mr-2"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Contacts Section -->
+            <div class="mb-8 border-t border-slate-600 pt-8">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold">Contact Information</h2>
+                        <p class="text-gray-400 text-sm sm:text-base">Manage your gym's contact details</p>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="contacts-loading" class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-2xl text-blue-400"></i>
+                    <p class="text-gray-400 mt-2">Loading contact information...</p>
+                </div>
+                
+                <!-- Contacts Form -->
+                <div id="contacts-form-container" class="hidden">
+                    <form id="contacts-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Email -->
+                            <div>
+                                <label class="block text-gray-300 text-sm mb-2">
+                                    <i class="fas fa-envelope mr-2 text-blue-400"></i>Email Address
+                                </label>
+                                <input type="email" id="contact-email" placeholder="contact@gym.com" required 
+                                       class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500 focus:outline-none">
+                            </div>
+                            
+                            <!-- Phone -->
+                            <div>
+                                <label class="block text-gray-300 text-sm mb-2">
+                                    <i class="fas fa-phone mr-2 text-green-400"></i>Phone Number
+                                </label>
+                                <input type="tel" id="contact-phone" placeholder="+1 (555) 123-4567" required 
+                                       class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500 focus:outline-none">
+                            </div>
+                        </div>
+                        
+                        <!-- WhatsApp -->
+                        <div>
+                            <label class="block text-gray-300 text-sm mb-2">
+                                <i class="fab fa-whatsapp mr-2 text-green-500"></i>WhatsApp Link
+                            </label>
+                            <input type="url" id="contact-whatsapp" placeholder="https://wa.me/+1234567890" required 
+                                   class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500 focus:outline-none">
+                            <p class="text-xs text-gray-400 mt-1">
+                                Format: https://wa.me/+[country code][phone number] (e.g., https://wa.me/+1234567890)
+                            </p>
+                        </div>
+                        
+                        <!-- Info Box -->
+                        <div class="bg-blue-900/30 border border-blue-500/50 rounded-lg p-4">
+                            <div class="flex items-start text-blue-400">
+                                <i class="fas fa-info-circle mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-semibold mb-2">Contact Information Guidelines</h4>
+                                    <ul class="text-sm text-blue-300 space-y-1">
+                                        <li>• Email will be used for customer inquiries and notifications</li>
+                                        <li>• Phone number should include country code for international access</li>
+                                        <li>• WhatsApp link allows customers to contact you directly via WhatsApp</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Error State -->
+                <div id="contacts-error" class="text-center py-8 hidden">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">Error Loading Contacts</h3>
+                    <p class="text-gray-500 mb-4">Failed to load contact information</p>
+                    <button onclick="fetchContacts()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition-colors">
+                        <i class="fas fa-retry mr-2"></i>Try Again
+                    </button>
+                </div>
+                
+                <!-- Save Button -->
+                <div class="mt-6 flex justify-end">
+                    <button id="save-contacts-btn" class="w-full sm:w-auto bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-400 transition-colors font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hidden">
+                        <i class="fas fa-save mr-2"></i>Save Contact Information
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Other Settings Placeholder -->
+            <div class="text-center py-8 border-t border-slate-600">
+                <i class="fas fa-cog text-4xl text-gray-500 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-400 mb-2">Additional Settings</h3>
+                <p class="text-gray-500">More settings will be added here</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Social Link Modal -->
+    <div id="social-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden backdrop-blur-sm">
+        <div class="flex items-center justify-center min-h-screen p-2 sm:p-4">
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl max-w-lg w-full mx-2 sm:mx-0 shadow-2xl border border-slate-700/50">
+                <div class="sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 p-4 sm:p-6 rounded-t-xl border-b border-slate-600/50">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg sm:text-2xl font-bold text-white flex items-center">
+                            <i class="fas fa-share-alt mr-2 sm:mr-3 text-blue-400"></i>
+                            <span id="modal-title">Add Social Link</span>
+                        </h2>
+                        <button onclick="closeSocialModal()" class="text-gray-400 hover:text-white text-lg sm:text-2xl transition-colors duration-200 hover:bg-slate-600 p-1 sm:p-2 rounded-lg">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-4 sm:p-6">
+                    <form id="social-form">
+                        <input type="hidden" id="social-index" value="-1">
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-300 text-sm mb-2">Platform Name:</label>
+                            <input type="text" id="social-name" placeholder="e.g., Facebook, Instagram, Twitter" required class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-300 text-sm mb-2">URL:</label>
+                            <input type="url" id="social-url" placeholder="https://..." required class="w-full bg-slate-700 text-white p-3 rounded-lg border border-slate-600 focus:border-blue-500">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-gray-300 text-sm mb-2">Icon:</label>
+                            <div class="flex items-center mb-3">
+                                <div id="selected-icon-preview" class="w-12 h-12 bg-slate-700 rounded-lg flex items-center justify-center mr-3 border border-slate-600">
+                                    <i class="fas fa-share-alt text-gray-400"></i>
+                                </div>
+                                <button type="button" onclick="openIconSelector()" class="bg-slate-700 text-white px-4 py-2 rounded-lg border border-slate-600 hover:bg-slate-600 transition-colors">
+                                    Choose Icon
+                                </button>
+                            </div>
+                            <input type="hidden" id="social-icon" value="fas fa-share-alt" required>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button type="button" onclick="closeSocialModal()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors">
+                                <i class="fas fa-save mr-2"></i>Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Icon Selector Modal -->
+    <div id="icon-selector-modal" class="fixed inset-0 bg-black bg-opacity-70 z-[60] hidden">
+        <div class="flex items-center justify-center min-h-screen p-2 sm:p-4">
+            <div class="bg-slate-800 rounded-xl max-w-2xl w-full mx-2 sm:mx-0 max-h-[90vh] sm:max-h-[80vh] overflow-hidden shadow-2xl border border-slate-700">
+                <div class="p-4 sm:p-6 border-b border-slate-600">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg sm:text-xl font-bold text-white">Select Icon</h3>
+                        <button onclick="closeIconSelector()" class="text-gray-400 hover:text-white text-lg sm:text-xl">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <input type="text" id="icon-search" placeholder="Search icons..." class="w-full mt-4 bg-slate-700 text-white p-2 rounded-lg border border-slate-600 focus:border-blue-500 text-sm sm:text-base">
+                </div>
+                <div class="p-4 sm:p-6 max-h-72 overflow-y-auto">
+                    <div id="icons-container" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+                        <!-- Icons will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    let socialLinksData = [];
+    let originalSocialLinksData = [];
+    let contactsData = {};
+    let originalContactsData = {};
+    let brandingData = {};
+    
+    // Popular social media icons
+    const popularIcons = [
+        { class: 'fab fa-facebook-f', name: 'Facebook' },
+        { class: 'fab fa-twitter', name: 'Twitter' },
+        { class: 'fab fa-instagram', name: 'Instagram' },
+        { class: 'fab fa-linkedin-in', name: 'LinkedIn' },
+        { class: 'fab fa-youtube', name: 'YouTube' },
+        { class: 'fab fa-tiktok', name: 'TikTok' },
+        { class: 'fab fa-snapchat-ghost', name: 'Snapchat' },
+        { class: 'fab fa-pinterest-p', name: 'Pinterest' },
+        { class: 'fab fa-telegram-plane', name: 'Telegram' },
+        { class: 'fab fa-whatsapp', name: 'WhatsApp' },
+        { class: 'fab fa-discord', name: 'Discord' },
+        { class: 'fab fa-reddit-alien', name: 'Reddit' },
+        { class: 'fab fa-twitch', name: 'Twitch' },
+        { class: 'fab fa-github', name: 'GitHub' },
+        { class: 'fab fa-gitlab', name: 'GitLab' },
+        { class: 'fas fa-envelope', name: 'Email' },
+        { class: 'fas fa-phone', name: 'Phone' },
+        { class: 'fas fa-globe', name: 'Website' },
+        { class: 'fas fa-share-alt', name: 'Share' },
+        { class: 'fas fa-link', name: 'Link' }
+    ];
+    
+    // Fetch social links
+    async function fetchSocialLinks() {
+        try {
+            showSocialLoading();
+            
+            const response = await fetch('/api/get-social-links');
+            if (!response.ok) {
+                throw new Error('Failed to fetch social links');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                socialLinksData = data.data || [];
+                originalSocialLinksData = JSON.parse(JSON.stringify(socialLinksData));
+                renderSocialLinks();
+                updateSaveButton();
+            } else {
+                throw new Error(data.message || 'Failed to fetch social links');
+            }
+            
+        } catch (error) {
+            console.error('Error fetching social links:', error);
+            showSocialError();
+        }
+    }
+    
+    // Render social links
+    function renderSocialLinks() {
+        const container = document.getElementById('social-links-container');
+        const noLinksState = document.getElementById('no-social-links');
+        const loadingState = document.getElementById('social-loading');
+        
+        loadingState.classList.add('hidden');
+        
+        if (socialLinksData.length === 0) {
+            container.classList.add('hidden');
+            noLinksState.classList.remove('hidden');
+            return;
+        }
+        
+        noLinksState.classList.add('hidden');
+        container.classList.remove('hidden');
+        
+        container.innerHTML = socialLinksData.map((link, index) => createSocialLinkCard(link, index)).join('');
+    }
+    
+    // Create social link card
+    function createSocialLinkCard(link, index) {
+        return `
+            <div class="bg-slate-800 rounded-lg p-4 border border-slate-600 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                        <i class="${link.icon} text-blue-400"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-semibold text-white">${link.name}</h4>
+                        <p class="text-sm text-gray-400 truncate">${link.url}</p>
+                    </div>
+                </div>
+                <div class="flex gap-2 self-end sm:self-auto">
+                    <button onclick="editSocialLink(${index})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-400 transition-colors">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteSocialLink(${index})" class="bg-red-500 text-white p-2 rounded hover:bg-red-400 transition-colors">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Social link modal functions
+    function openSocialModal(index = -1) {
+        const modal = document.getElementById('social-modal');
+        const title = document.getElementById('modal-title');
+        
+        if (index >= 0) {
+            // Edit mode
+            const link = socialLinksData[index];
+            title.textContent = 'Edit Social Link';
+            document.getElementById('social-index').value = index;
+            document.getElementById('social-name').value = link.name;
+            document.getElementById('social-url').value = link.url;
+            document.getElementById('social-icon').value = link.icon;
+            updateIconPreview(link.icon);
+        } else {
+            // Add mode
+            title.textContent = 'Add Social Link';
+            document.getElementById('social-index').value = -1;
+            document.getElementById('social-form').reset();
+            document.getElementById('social-icon').value = 'fas fa-share-alt';
+            updateIconPreview('fas fa-share-alt');
+        }
+        
+        modal.classList.remove('hidden');
+    }
+    
+    function closeSocialModal() {
+        document.getElementById('social-modal').classList.add('hidden');
+        document.getElementById('social-form').reset();
+    }
+    
+    function editSocialLink(index) {
+        openSocialModal(index);
+    }
+    
+    function deleteSocialLink(index) {
+        socialLinksData.splice(index, 1);
+        renderSocialLinks();
+        updateSaveButton();
+        showSuccessMessage('Social link deleted successfully!');
+    }
+    
+    // Icon selector functions
+    function openIconSelector() {
+        const modal = document.getElementById('icon-selector-modal');
+        renderIcons();
+        modal.classList.remove('hidden');
+    }
+    
+    function closeIconSelector() {
+        document.getElementById('icon-selector-modal').classList.add('hidden');
+    }
+    
+    function renderIcons(searchTerm = '') {
+        const container = document.getElementById('icons-container');
+        const filteredIcons = popularIcons.filter(icon => 
+            icon.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            icon.class.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        container.innerHTML = filteredIcons.map(icon => `
+            <div class="bg-slate-700 p-3 rounded-lg cursor-pointer text-center hover:bg-slate-600 transition-colors" onclick="selectIcon('${icon.class}')">
+                <i class="${icon.class} text-lg text-gray-300"></i>
+                <p class="text-xs text-gray-400 mt-1 truncate">${icon.name}</p>
+            </div>
+        `).join('');
+    }
+    
+    function selectIcon(iconClass) {
+        document.getElementById('social-icon').value = iconClass;
+        updateIconPreview(iconClass);
+        closeIconSelector();
+    }
+    
+    function updateIconPreview(iconClass) {
+        const preview = document.getElementById('selected-icon-preview');
+        preview.innerHTML = `<i class="${iconClass} text-blue-400"></i>`;
+    }
+    
+    // Form submission
+    document.getElementById('social-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const index = parseInt(document.getElementById('social-index').value);
+        const name = document.getElementById('social-name').value;
+        const url = document.getElementById('social-url').value;
+        const icon = document.getElementById('social-icon').value;
+        
+        const linkData = { name, url, icon };
+        
+        if (index >= 0) {
+            // Edit existing
+            socialLinksData[index] = linkData;
+            showSuccessMessage('Social link updated successfully!');
+        } else {
+            // Add new
+            socialLinksData.push(linkData);
+            showSuccessMessage('Social link added successfully!');
+        }
+        
+        renderSocialLinks();
+        updateSaveButton();
+        closeSocialModal();
+    });
+    
+    // Icon search
+    document.getElementById('icon-search').addEventListener('input', function(e) {
+        renderIcons(e.target.value);
+    });
+    
+    // Save social links
+    async function saveSocialLinks() {
+        try {
+            const saveBtn = document.getElementById('save-social-btn');
+            const originalText = saveBtn.innerHTML;
+            
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+            
+            const response = await fetch('/api/save-social-links', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(socialLinksData)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to save social links');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                originalSocialLinksData = JSON.parse(JSON.stringify(socialLinksData));
+                updateSaveButton();
+                showSuccessMessage('Social links saved successfully!');
+            } else {
+                throw new Error(data.message || 'Failed to save social links');
+            }
+            
+        } catch (error) {
+            console.error('Error saving social links:', error);
+            showErrorMessage('Failed to save social links. Please try again.');
+        } finally {
+            const saveBtn = document.getElementById('save-social-btn');
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Save Changes';
+        }
+    }
+    
+    // Contacts functionality
+    async function fetchContacts() {
+        try {
+            showContactsLoading();
+            
+            const response = await fetch('/api/get-contacts');
+            if (!response.ok) {
+                throw new Error('Failed to fetch contacts');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                contactsData = data.data || {};
+                originalContactsData = JSON.parse(JSON.stringify(contactsData));
+                renderContacts();
+                updateContactsSaveButton();
+            } else {
+                throw new Error(data.message || 'Failed to fetch contacts');
+            }
+            
+        } catch (error) {
+            console.error('Error fetching contacts:', error);
+            showContactsError();
+        }
+    }
+    
+    function renderContacts() {
+        const loadingState = document.getElementById('contacts-loading');
+        const formContainer = document.getElementById('contacts-form-container');
+        const errorState = document.getElementById('contacts-error');
+        const saveBtn = document.getElementById('save-contacts-btn');
+        
+        loadingState.classList.add('hidden');
+        errorState.classList.add('hidden');
+        formContainer.classList.remove('hidden');
+        saveBtn.classList.remove('hidden');
+        
+        // Populate form fields
+        document.getElementById('contact-email').value = contactsData.email || '';
+        document.getElementById('contact-phone').value = contactsData.phone || '';
+        document.getElementById('contact-whatsapp').value = contactsData.whatsapp || '';
+        
+        // Add event listeners for form changes
+        addContactsFormListeners();
+    }
+    
+    function addContactsFormListeners() {
+        const inputs = ['contact-email', 'contact-phone', 'contact-whatsapp'];
+        
+        inputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('input', () => {
+                    updateContactsData();
+                    updateContactsSaveButton();
+                });
+            }
+        });
+    }
+    
+    function updateContactsData() {
+        contactsData = {
+            email: document.getElementById('contact-email').value.trim(),
+            phone: document.getElementById('contact-phone').value.trim(),
+            whatsapp: document.getElementById('contact-whatsapp').value.trim()
+        };
+    }
+    
+    async function saveContacts() {
+        try {
+            const saveBtn = document.getElementById('save-contacts-btn');
+            const originalText = saveBtn.innerHTML;
+            
+            // Validate form
+            const form = document.getElementById('contacts-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+            
+            updateContactsData();
+            
+            const response = await fetch('/api/update-contacts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(contactsData)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to save contacts');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                originalContactsData = JSON.parse(JSON.stringify(contactsData));
+                updateContactsSaveButton();
+                showSuccessMessage('Contact information saved successfully!');
+            } else {
+                throw new Error(data.message || 'Failed to save contacts');
+            }
+            
+        } catch (error) {
+            console.error('Error saving contacts:', error);
+            showErrorMessage('Failed to save contact information. Please try again.');
+        } finally {
+            const saveBtn = document.getElementById('save-contacts-btn');
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Save Contact Information';
+        }
+    }
+    
+    function updateSaveButton() {
+        const saveBtn = document.getElementById('save-social-btn');
+        const hasChanges = JSON.stringify(socialLinksData) !== JSON.stringify(originalSocialLinksData);
+        
+        if (hasChanges) {
+            saveBtn.classList.remove('opacity-50');
+            saveBtn.disabled = false;
+        } else {
+            saveBtn.classList.add('opacity-50');
+            saveBtn.disabled = true;
+        }
+    }
+    
+    function updateContactsSaveButton() {
+        const saveBtn = document.getElementById('save-contacts-btn');
+        if (!saveBtn) return;
+        
+        const hasChanges = JSON.stringify(contactsData) !== JSON.stringify(originalContactsData);
+        
+        if (hasChanges) {
+            saveBtn.classList.remove('opacity-50');
+            saveBtn.disabled = false;
+        } else {
+            saveBtn.classList.add('opacity-50');
+            saveBtn.disabled = true;
+        }
+    }
+    
+    function showSocialLoading() {
+        document.getElementById('social-loading').classList.remove('hidden');
+        document.getElementById('social-links-container').classList.add('hidden');
+        document.getElementById('no-social-links').classList.add('hidden');
+    }
+    
+    function showSocialError() {
+        document.getElementById('social-loading').classList.add('hidden');
+        document.getElementById('social-links-container').classList.add('hidden');
+        document.getElementById('no-social-links').classList.remove('hidden');
+    }
+    
+    function showContactsLoading() {
+        document.getElementById('contacts-loading').classList.remove('hidden');
+        document.getElementById('contacts-form-container').classList.add('hidden');
+        document.getElementById('contacts-error').classList.add('hidden');
+        document.getElementById('save-contacts-btn').classList.add('hidden');
+    }
+    
+    function showContactsError() {
+        document.getElementById('contacts-loading').classList.add('hidden');
+        document.getElementById('contacts-form-container').classList.add('hidden');
+        document.getElementById('contacts-error').classList.remove('hidden');
+        document.getElementById('save-contacts-btn').classList.add('hidden');
+    }
+    
+    // Branding functionality
+    async function fetchBranding() {
+        try {
+            showBrandingLoading();
+            
+            const response = await fetch('/api/get-logo-and-favicon');
+            if (!response.ok) {
+                throw new Error('Failed to fetch branding');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                brandingData = data.data || {};
+                renderBranding();
+            } else {
+                throw new Error(data.message || 'Failed to fetch branding');
+            }
+            
+        } catch (error) {
+            console.error('Error fetching branding:', error);
+            showBrandingError();
+        }
+    }
+    
+    function renderBranding() {
+        const loadingState = document.getElementById('branding-loading');
+        const content = document.getElementById('branding-content');
+        const errorState = document.getElementById('branding-error');
+        
+        loadingState.classList.add('hidden');
+        errorState.classList.add('hidden');
+        content.classList.remove('hidden');
+        
+        // Render logo
+        const currentLogo = document.getElementById('current-logo');
+        const logoPlaceholder = document.getElementById('logo-placeholder');
+        
+        if (brandingData.logo) {
+            currentLogo.src = brandingData.logo;
+            currentLogo.style.display = 'block';
+            logoPlaceholder.style.display = 'none';
+        } else {
+            currentLogo.style.display = 'none';
+            logoPlaceholder.style.display = 'block';
+        }
+        
+        // Render favicon
+        const currentFavicon = document.getElementById('current-favicon');
+        const faviconPlaceholder = document.getElementById('favicon-placeholder');
+        
+        if (brandingData.favicon) {
+            currentFavicon.src = brandingData.favicon;
+            currentFavicon.style.display = 'block';
+            faviconPlaceholder.style.display = 'none';
+        } else {
+            currentFavicon.style.display = 'none';
+            faviconPlaceholder.style.display = 'block';
+        }
+        
+        // Add event listeners
+        addBrandingEventListeners();
+    }
+    
+    function addBrandingEventListeners() {
+        // Logo upload
+        const logoInput = document.getElementById('logo-input');
+        logoInput.addEventListener('change', (e) => handleImageUpload(e, 'logo'));
+        
+        // Favicon upload
+        const faviconInput = document.getElementById('favicon-input');
+        faviconInput.addEventListener('change', (e) => handleImageUpload(e, 'favicon'));
+    }
+    
+    async function handleImageUpload(event, type) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        // Validate file
+        const validation = validateImageFile(file, type);
+        if (!validation.valid) {
+            showErrorMessage(validation.message);
+            event.target.value = ''; // Clear input
+            return;
+        }
+        
+        try {
+            await uploadBrandingImage(file, type);
+        } catch (error) {
+            console.error(`Error uploading ${type}:`, error);
+            showErrorMessage(`Failed to upload ${type}. Please try again.`);
+        }
+        
+        // Clear input for next upload
+        event.target.value = '';
+    }
+    
+    function validateImageFile(file, type) {
+        // Check file size (2MB limit)
+        if (file.size > 2 * 1024 * 1024) {
+            return { valid: false, message: 'File size must be less than 2MB' };
+        }
+        
+        // Check file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            return { valid: false, message: 'Only JPG, PNG, and GIF files are allowed' };
+        }
+        
+        return { valid: true };
+    }
+    
+    async function uploadBrandingImage(file, type) {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('type', type);
+        
+        // Show loading state
+        const uploadBtn = type === 'logo' 
+            ? document.querySelector('button[onclick="document.getElementById(\'logo-input\').click()"]')
+            : document.querySelector('button[onclick="document.getElementById(\'favicon-input\').click()"]');
+        
+        const originalText = uploadBtn.innerHTML;
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...`;
+        
+        try {
+            const response = await fetch('/api/change-logo-or-favicon', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to upload ${type}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showSuccessMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} uploaded successfully!`);
+                // Refresh branding data
+                await fetchBranding();
+            } else {
+                throw new Error(data.message || `Failed to upload ${type}`);
+            }
+            
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = originalText;
+        }
+    }
+    
+    function showBrandingLoading() {
+        document.getElementById('branding-loading').classList.remove('hidden');
+        document.getElementById('branding-content').classList.add('hidden');
+        document.getElementById('branding-error').classList.add('hidden');
+    }
+    
+    function showBrandingError() {
+        document.getElementById('branding-loading').classList.add('hidden');
+        document.getElementById('branding-content').classList.add('hidden');
+        document.getElementById('branding-error').classList.remove('hidden');
+    }
+    
+    // Success/Error messages
+    function showSuccessMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-2 sm:right-4 bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow-lg z-50 max-w-xs sm:max-w-sm text-sm sm:text-base';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    function showErrorMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-2 sm:right-4 bg-red-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow-lg z-50 max-w-xs sm:max-w-sm text-sm sm:text-base';
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    // Event listeners
+    document.getElementById('add-social-btn').addEventListener('click', () => openSocialModal());
+    document.getElementById('save-social-btn').addEventListener('click', saveSocialLinks);
+    document.getElementById('save-contacts-btn').addEventListener('click', saveContacts);
+    
+    // Close modals when clicking outside
+    document.getElementById('social-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeSocialModal();
+        }
+    });
+    
+    document.getElementById('icon-selector-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeIconSelector();
+        }
+    });
+    
+    // Close modals with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const socialModal = document.getElementById('social-modal');
+            const iconModal = document.getElementById('icon-selector-modal');
+            
+            if (!iconModal.classList.contains('hidden')) {
+                closeIconSelector();
+            } else if (!socialModal.classList.contains('hidden')) {
+                closeSocialModal();
+            }
+        }
+    });
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchBranding();
+        fetchSocialLinks();
+        fetchContacts();
+    });
+</script>
+</body>
+</html>

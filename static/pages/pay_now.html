@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Preload critical resources first -->
+    <link rel="preload" href="{{data.site.logo or '/images/logo.png' }}" as="image">
+    <link rel="preload" href="{{data.site.favicon or '/images/favicon.png' }}" as="image">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style">
+    
+    <title>Pay Now - {{ data.site.name or 'Aesthetic Fitness Gym' }}</title>
+    <meta name="description" content="Complete your membership payment for {{ data.site.name or 'Aesthetic Fitness Gym' }}.">
+
+    {% if data.seo_texts %}
+    {% for seo_text in data.seo_texts %}
+    {{ seo_text | safe }}
+    {% endfor %}
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{data.site.favicon or '/images/favicon.png' }}" type="image/x-icon">
+    <link rel="stylesheet" href="/static/styles/colors.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+    {% set active_sidebar = 'payment' %}
+    <!-- Header -->
+    {% include '/components/header.html' %}
+    
+    <main class="pt-16 lg:pt-20">
+        <section class="relative py-12 md:py-16 bg-black overflow-hidden">
+            <div class="absolute inset-0">
+                <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-[linear-gradient(rgba(255,107,53,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,107,53,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+                </div>
+            </div>
+              <div class="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
+                <div class="max-w-7xl mx-auto">
+                    <!-- Main Content -->
+                    <div class="space-y-8">
+                                <!-- Page Header -->
+                                <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-3xl p-8">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl flex items-center justify-center">
+                                            <i class="fas fa-credit-card text-white text-2xl"></i>
+                                        </div>
+                                        <div>
+                                            <h1 class="text-3xl lg:text-4xl font-bold text-white mb-2">Pay Now</h1>
+                                            <p class="text-gray-400">Complete your membership payment</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Status Alert -->
+                                <div id="payment-alert" class="hidden">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                                
+                                <div class="grid lg:grid-cols-3 gap-8">
+                                    <!-- Payment Summary -->
+                                    <div class="lg:col-span-2 space-y-6">
+                                        <!-- Current Membership Info -->
+                                        <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6">
+                                            <div class="flex items-center space-x-3 mb-6">
+                                                <i class="fas fa-user-check text-blue-400 text-xl"></i>
+                                                <h2 class="text-xl font-bold text-white">Current Membership</h2>
+                                            </div>
+                                            
+                                            <div class="grid md:grid-cols-2 gap-4">
+                                                <div class="space-y-3">
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-400">Status:</span>
+                                                        <span id="current-status" class="text-white font-medium">Loading...</span>
+                                                    </div>
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-400">Plan:</span>
+                                                        <span id="current-plan" class="text-white font-medium">Loading...</span>
+                                                    </div>
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-400">Member ID:</span>
+                                                        <span id="current-member-id" class="text-white font-mono">Loading...</span>
+                                                    </div>
+                                                </div>
+                                                <div class="space-y-3">
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-400">Expires:</span>
+                                                        <span id="current-expiry" class="text-white font-medium">Loading...</span>
+                                                    </div>
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-400">Renewal Date:</span>
+                                                        <span id="current-renewal" class="text-white font-medium">Loading...</span>
+                                                    </div>
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-400">Payment Cycle:</span>
+                                                        <span id="current-cycle" class="text-white font-medium">Loading...</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Payment Methods -->
+                                        <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6">
+                                            <div class="flex items-center space-x-3 mb-6">
+                                                <i class="fas fa-wallet text-green-400 text-xl"></i>
+                                                <h2 class="text-xl font-bold text-white">Select Payment Method</h2>
+                                            </div>
+                                            <div id="payment-methods-list" class="space-y-3">
+                                                <!-- Payment methods will be loaded here -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Payment Summary Sidebar -->
+                                    <div class="lg:col-span-1">
+                                        <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 sticky top-8">
+                                            <div class="flex items-center space-x-3 mb-6">
+                                                <i class="fas fa-receipt text-purple-400 text-xl"></i>
+                                                <h2 class="text-xl font-bold text-white">Payment Summary</h2>
+                                            </div>
+
+                                            <div class="space-y-4">
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-400">Membership Renewal</span>
+                                                    <span id="renewal-amount" class="text-white font-semibold">Loading...</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-400">Service Fee</span>
+                                                    <span class="text-green-400 font-semibold">Free</span>
+                                                </div>
+                                                
+                                                <div class="border-t border-gray-600 pt-4">
+                                                    <div class="flex justify-between text-lg">
+                                                        <span class="text-white font-bold">Total Amount</span>
+                                                        <span id="total-amount" class="text-white font-bold">Loading...</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-6 space-y-4">
+                                                    <div id="selected-method-details" class="hidden"></div>
+
+                                                    <div id="transaction-id-container" class="hidden">
+                                                        <label for="transaction-id-input" class="block text-gray-300 mb-1 text-sm">Transaction ID</label>
+                                                        <input id="transaction-id-input" type="text" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Transaction ID">
+                                                    </div>
+
+                                                    <div class="bg-blue-900 border border-blue-700 rounded-lg p-3">
+                                                        <div class="flex items-center space-x-2">
+                                                            <i class="fas fa-info-circle text-blue-400"></i>
+                                                            <span class="text-blue-200 text-sm">Your membership will be extended from the current expiry date</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="payment-status-message" class="text-center text-sm my-2"></div>
+
+                                                    <!-- Payment Button -->
+                                                    <button id="submit-payment-btn" disabled class="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                        <i class="fas fa-check-circle mr-2"></i>
+                                                        <span id="payment-btn-text">Submit Payment</span>
+                                                    </button>
+
+                                                    <div class="mt-4 text-center">
+                                                        <a href="/account/membership" class="text-gray-400 hover:text-white transition-colors duration-300 text-sm">
+                                                            <i class="fas fa-arrow-left mr-1"></i>
+                                                            Back to Membership
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>                                
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+        
+    <!-- Footer -->
+    {% include '/components/footer.html' %}
+
+    <script>
+        let membershipData = null;
+        let selectedCustomMethod = null;
+
+        // Load membership data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMembershipData();
+            loadPaymentMethods();
+            
+            document.getElementById('transaction-id-input').addEventListener('input', checkFormValidity);
+            document.getElementById('submit-payment-btn').addEventListener('click', submitPayment);
+        });
+
+        async function loadMembershipData() {
+            try {
+                const response = await fetch('/api/get-membership-state');
+                
+                if (!response.ok) {
+                    console.error('Failed to fetch membership state');
+                    showError();
+                    return;
+                }
+
+                const result = await response.json();
+                
+                if (!result.success || !result.data) {
+                    console.error('Invalid response format');
+                    showError();
+                    return;
+                }
+
+                membershipData = result.data;
+                renderMembershipData(membershipData);
+                checkPaymentEligibility(membershipData);
+                
+            } catch (error) {
+                console.error('Error fetching membership state:', error);
+                showError();
+            }
+        }
+
+        async function loadPaymentMethods() {
+            const paymentMethodsList = document.getElementById('payment-methods-list');
+            paymentMethodsList.innerHTML = '<div class="text-gray-400 text-center py-4">Loading...</div>';
+            try {
+                const res = await fetch('/api/get-payment-methods');
+                const data = await res.json();
+                if (data.success && data.data && Array.isArray(data.data.methods)) {
+                    paymentMethodsList.innerHTML = data.data.methods.map(method => `
+                        <div class="flex items-center space-x-3 border border-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-800 transition payment-method-item" onclick="selectCustomPaymentMethod('${method.id}', '${method.number}', '${method.type}', this, '${method.name}', '${method.icon}', \`${method.note || ''}\`)">
+                            <img src="${method.icon}" alt="${method.name}" class="w-10 h-10 rounded bg-white p-1">
+                            <div class="flex-1">
+                                <div class="text-white font-semibold">${method.name}</div>
+                                <div class="text-gray-400 text-xs">${method.number} (${method.type})</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    paymentMethodsList.innerHTML = '<div class="text-red-400 text-center py-4">Failed to load payment methods.</div>';
+                }
+            } catch (e) {
+                paymentMethodsList.innerHTML = '<div class="text-red-400 text-center py-4">Error loading payment methods.</div>';
+            }
+        }
+
+        function selectCustomPaymentMethod(id, number, type, element, name, icon, note) {
+            selectedCustomMethod = id;
+            document.getElementById('payment-status-message').innerHTML = '';
+            document.getElementById('payment-status-message').className = '';
+
+            // empty the transaction ID input
+            document.getElementById('transaction-id-input').value = '';
+            
+            // Show transaction ID field and payment details
+            document.getElementById('transaction-id-container').classList.remove('hidden');
+            const detailsContainer = document.getElementById('selected-method-details');
+            detailsContainer.classList.remove('hidden');
+            detailsContainer.innerHTML = `
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-3 mb-3 flex items-center space-x-4">
+                    <img src="${icon}" alt="${name}" class="w-12 h-12 rounded-lg bg-white p-1 flex-shrink-0">
+                    <div class="flex-1 text-left">
+                        <h4 class="text-md font-semibold text-white">${name || 'Custom Payment Method'}</h4>
+                        <p class="text-gray-400 text-xs mb-1">Pay to this <span class="font-semibold text-yellow-400">${type}</span> number:</p>
+                        <div class="flex items-center space-x-2">
+                            <strong class="text-md text-white font-mono bg-gray-900 px-3 py-1 rounded-md">${number}</strong>
+                            <button onclick="copyToClipboard('${number}', this)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-1 px-2 rounded text-xs transition-colors">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        ${note ? `<div class="mt-2 text-xs text-gray-400 bg-gray-900 p-2 rounded-md">${note}</div>` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Update UI
+            const allMethods = document.querySelectorAll('.payment-method-item');
+            allMethods.forEach(el => {
+                el.classList.remove('bg-blue-900', 'border-blue-400');
+                el.classList.add('border-gray-700');
+            });
+            element.classList.add('bg-blue-900', 'border-blue-400');
+            element.classList.remove('border-gray-700');
+
+            checkFormValidity();
+        }
+
+        function checkFormValidity() {
+            const transactionId = document.getElementById('transaction-id-input').value.trim();
+            const submitBtn = document.getElementById('submit-payment-btn');
+            document.getElementById('payment-status-message').innerHTML = '';
+            
+            if (selectedCustomMethod && transactionId) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        async function submitPayment() {
+            const transactionId = document.getElementById('transaction-id-input').value.trim();
+            if (!selectedCustomMethod || !transactionId) {
+                alert('Please select a payment method and enter the transaction ID.');
+                return;
+            }
+
+            if (!membershipData) {
+                alert('Could not determine payment amount. Please refresh and try again.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit-payment-btn');
+            const messageDiv = document.getElementById('payment-status-message');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...';
+            messageDiv.innerHTML = '';
+
+            try {
+                const res = await fetch('/api/submit-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        payment_method_id: selectedCustomMethod, 
+                        transaction_id: transactionId,
+                        amount: membershipData.membership_renewal_price
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    messageDiv.className = 'text-center bg-green-800 mt-4 rounded-lg p-4';
+                    messageDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i><span class="text-white">Payment successful! Redirecting...</span>';
+                    setTimeout(() => window.location.href = '/account/payments', 1500);
+                } else {
+                    messageDiv.className = 'text-center bg-red-800 mt-4 rounded-lg p-4';
+                    messageDiv.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i><span class="text-white">${data.message || data.error || 'Failed To Submit'}</span>`;
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Submit Payment';
+                }
+            } catch (e) {
+                messageDiv.className = 'text-center bg-red-800 mt-4 rounded-lg p-4';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i><span class="text-white">${e.message || e.error || 'Failed To Submit'}</span>`;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Submit Payment';
+            }
+        }
+
+        function renderMembershipData(data) {
+            // Current membership info
+            document.getElementById('current-status').textContent = data.membership_active ? 'Active' : 'Inactive';
+            document.getElementById('current-plan').textContent = data.membership_type || 'No Plan';
+            document.getElementById('current-member-id').textContent = data.card_id || 'Not Assigned';
+            document.getElementById('current-expiry').textContent = formatDate(data.membership_end_date) || 'N/A';
+            document.getElementById('current-renewal').textContent = formatDate(data.membership_renewal_date) || 'N/A';
+            document.getElementById('current-cycle').textContent = data.membership_payment_cycle || 'N/A';
+
+            // Payment amounts
+            const renewalPrice = data.membership_renewal_price || 0;
+            document.getElementById('renewal-amount').textContent = `৳${renewalPrice}`;
+            document.getElementById('total-amount').textContent = `৳${renewalPrice}`;
+
+            // Update status indicator
+            const statusElement = document.getElementById('current-status');
+            if (data.membership_active) {
+                statusElement.className = 'text-green-400 font-medium';
+            } else {
+                statusElement.className = 'text-red-400 font-medium';
+            }
+        }
+
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalContent = button.innerHTML;
+                button.innerHTML = 'Copied!';
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        function checkPaymentEligibility(data) {
+            const alertDiv = document.getElementById('payment-alert');
+            
+            if (!data.membership_active) {
+                // Membership is inactive
+                alertDiv.innerHTML = `
+                    <div class="bg-red-900 border border-red-700 rounded-xl p-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-exclamation-triangle text-red-400 text-xl"></i>
+                            <div>
+                                <h3 class="text-red-300 font-semibold">Membership Inactive</h3>
+                                <p class="text-red-200 text-sm mt-1">
+                                    Your membership is currently inactive. Please contact support to reactivate your membership.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                alertDiv.classList.remove('hidden');
+                document.getElementById('submit-payment-btn').disabled = true;
+                return;
+            }
+
+            if (data.membership_cancelled) {
+                // Membership is cancelled
+                alertDiv.innerHTML = `
+                    <div class="bg-orange-900 border border-orange-700 rounded-xl p-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-ban text-orange-400 text-xl"></i>
+                            <div>
+                                <h3 class="text-orange-300 font-semibold">Membership Cancelled</h3>
+                                <p class="text-orange-200 text-sm mt-1">
+                                    Your membership has been cancelled. Please contact support to reactivate before making a payment.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                alertDiv.classList.remove('hidden');
+                document.getElementById('submit-payment-btn').disabled = true;
+                return;
+            }
+
+            // Check if renewal is due soon
+            if (data.membership_renewal_date) {
+                const renewalDate = new Date(data.membership_renewal_date);
+                const currentDate = new Date();
+                const timeDiff = renewalDate.getTime() - currentDate.getTime();
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                if (daysDiff <= 7 && daysDiff >= 0) {
+                    const urgencyClass = daysDiff <= 3 ? 'bg-red-900 border-red-700' : 'bg-yellow-900 border-yellow-700';
+                    const textColor = daysDiff <= 3 ? 'text-red-300' : 'text-yellow-300';
+                    const messageColor = daysDiff <= 3 ? 'text-red-200' : 'text-yellow-200';
+                    
+                    alertDiv.innerHTML = `
+                        <div class="${urgencyClass} border rounded-xl p-4">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-clock ${textColor} text-xl"></i>
+                                <div>
+                                    <h3 class="${textColor} font-semibold">Renewal Due Soon</h3>
+                                    <p class="${messageColor} text-sm mt-1">
+                                        Your membership renewal is due in ${daysDiff} day${daysDiff !== 1 ? 's' : ''}. Complete your payment to avoid service interruption.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    alertDiv.classList.remove('hidden');
+                }
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return null;
+            
+            const date = new Date(dateString);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        function showError() {
+            document.getElementById('current-status').textContent = 'Error loading data';
+            document.getElementById('submit-payment-btn').disabled = true;
+            document.getElementById('submit-payment-btn').innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Error';
+        }
+    </script>
+</body>
+</html>

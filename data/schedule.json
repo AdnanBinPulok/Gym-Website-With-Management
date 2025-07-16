@@ -1,0 +1,142 @@
+{
+    "monday": [
+        {
+            "gender": "male",
+            "start_time": "7:00 AM",
+            "end_time": "12:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "male",
+            "start_time": "12:00 PM",
+            "end_time": "5:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "all",
+            "start_time": "5:00 PM",
+            "end_time": "11:00 PM",
+            "is_open": true
+        }
+    ],
+    "tuesday": [
+        {
+            "gender": "male",
+            "start_time": "7:00 AM",
+            "end_time": "12:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "female",
+            "start_time": "12:00 PM",
+            "end_time": "5:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "all",
+            "start_time": "5:00 PM",
+            "end_time": "11:00 PM",
+            "is_open": true
+        }
+    ],
+    "wednesday": [
+        {
+            "gender": "male",
+            "start_time": "7:00 AM",
+            "end_time": "12:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "female",
+            "start_time": "12:00 PM",
+            "end_time": "5:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "all",
+            "start_time": "5:00 PM",
+            "end_time": "11:00 PM",
+            "is_open": true
+        }
+    ],
+    "thursday": [
+        {
+            "gender": "male",
+            "start_time": "7:00 AM",
+            "end_time": "12:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "female",
+            "start_time": "12:00 PM",
+            "end_time": "5:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "all",
+            "start_time": "5:00 PM",
+            "end_time": "11:00 PM",
+            "is_open": true
+        }
+    ],
+    "friday": [
+        {
+            "gender": "male",
+            "start_time": "7:00 AM",
+            "end_time": "12:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "female",
+            "start_time": "12:00 PM",
+            "end_time": "5:00 PM",
+            "is_open": false
+        },
+        {
+            "gender": "all",
+            "start_time": "5:00 PM",
+            "end_time": "11:00 PM",
+            "is_open": false
+        }
+    ],
+    "saturday": [
+        {
+            "gender": "male",
+            "start_time": "7:00 AM",
+            "end_time": "12:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "female",
+            "start_time": "12:00 PM",
+            "end_time": "5:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "all",
+            "start_time": "5:00 PM",
+            "end_time": "11:00 PM",
+            "is_open": true
+        }
+    ],
+    "sunday": [
+        {
+            "gender": "male",
+            "start_time": "7:00 AM",
+            "end_time": "12:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "female",
+            "start_time": "12:00 PM",
+            "end_time": "5:00 PM",
+            "is_open": true
+        },
+        {
+            "gender": "all",
+            "start_time": "5:00 PM",
+            "end_time": "11:00 PM",
+            "is_open": true
+        }
+    ]
+}
